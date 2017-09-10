@@ -15,6 +15,10 @@ import Client.Utils.MoveType;
 import Server.Components.EnergyComponent;
 import Server.Components.HealthComponent;
 import Server.Components.IdComponent;
+import Server.Components.StateComponent;
+import Server.Enities.ServerPlayer;
+import Server.Utils.MoveInformation;
+import Server.Utils.PlayerState;
 
 public class MoveSystem extends EntitySystem{
 
@@ -23,6 +27,7 @@ public class MoveSystem extends EntitySystem{
 	private ImmutableArray<Entity> entities;
 	
 	private ComponentMapper<IdComponent> im = ComponentMapper.getFor(IdComponent.class);
+	private ComponentMapper<StateComponent> sm = ComponentMapper.getFor(StateComponent.class);
 	private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 	private ComponentMapper<EnergyComponent> em = ComponentMapper.getFor(EnergyComponent.class);
 	
@@ -40,7 +45,9 @@ public class MoveSystem extends EntitySystem{
 	@Override
 	public void update(float deltaTime) {
 		
-		//Checks if all moves can be preformed
+		LinkedList<MoveRequest> moves = (LinkedList<MoveRequest>) this.moves.clone(); //Cloned because move requests could be received during processing
+		
+		//Checks if all moves can be performed
 		for(Entity entity : entities){
 			
 			for(int i = 0; i < moves.size(); ++i){
@@ -65,28 +72,81 @@ public class MoveSystem extends EntitySystem{
 			
 		}
 		
-		//Preforms moves
-		for(Entity entity : entities){
+		for(MoveRequest r : moves){
 			
-			for(MoveRequest r : moves){
-				
+			//Performs moves
+			for(Entity entity : entities){
 				IdComponent ic = im.get(entity);
 				
 				//Perform moves
-				if(ic.id != r.id){
-					HealthComponent hc = hm.get(entity);
-					
+				if(ic.id == r.id){
+					preformMove((ServerPlayer)entity, r);
 				}
 				
 			}
 			
 		}
 		
+		
+		
+		moves.clear();
+		
 	}
 
-	private float getEnergyCost(MoveType move) {
-		// TODO Auto-generated method stub
+	
+	//Performs the specified move
+	private void preformMove(ServerPlayer player, MoveRequest r) {
+		
+		if(r.move == MoveType.BLOCK){
+			StateComponent sc = sm.get(player);
+			sc.state =  PlayerState.BLOCKING;
+			player.setStateTimer(1);
+		}else{
+			for(Entity entity : entities){
+				IdComponent ic = im.get(entity);
+				if(ic.id != r.id){
+					
+				}
+			}
+		}
+		
+	}
+
+	private int getDamage(MoveType move){
+		
+		if(move == MoveType.JAB){
+			return MoveInformation.JAB_DAMAGE;
+		}else if(move == MoveType.CROSS){
+			return MoveInformation.CROSS_DAMAGE;
+		}else if(move == MoveType.UPPERCUT){
+			return MoveInformation.UPPERCUT_DAMAGE;
+		}else if(move == MoveType.HOOK){
+			return MoveInformation.HOOK_DAMAGE;
+		}else if(move == MoveType.COUNTER){
+			return MoveInformation.COUNTER_DAMAGE;
+		}
+		
 		return 0;
+		
+	}
+	
+	private int getEnergyCost(MoveType move) {
+		
+		if(move == MoveType.JAB){
+			return MoveInformation.JAB_COST;
+		}else if(move == MoveType.CROSS){
+			return MoveInformation.CROSS_COST;
+		}else if(move == MoveType.UPPERCUT){
+			return MoveInformation.UPPERCUT_COST;
+		}else if(move == MoveType.HOOK){
+			return MoveInformation.HOOK_COST;
+		}else if(move == MoveType.BLOCK){
+			return MoveInformation.BLOCK_COST;
+		}else if(move == MoveType.COUNTER){
+			return MoveInformation.COUNTER_COST;
+		}
+		
+		return MoveInformation.MAX_ENERGY + 1; 
 	}
 	
 	
