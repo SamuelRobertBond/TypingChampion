@@ -3,7 +3,8 @@ package Server.Utils;
 public enum PlayerState {
 
 	OPEN,
-	ATTACKING,
+	WEAKEND,
+	JABBING,
 	BLOCKING,
 	DOWNED,
 	KNOCKED_OUT,

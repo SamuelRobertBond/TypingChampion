@@ -46,6 +46,7 @@ public class MoveSystem extends EntitySystem{
 	public void update(float deltaTime) {
 		
 		LinkedList<MoveRequest> moves = (LinkedList<MoveRequest>) this.moves.clone(); //Cloned because move requests could be received during processing
+		this.moves.clear();
 		
 		//Checks if all moves can be performed
 		for(Entity entity : entities){
@@ -103,30 +104,71 @@ public class MoveSystem extends EntitySystem{
 			player.setStateTimer(1);
 		}else{
 			for(Entity entity : entities){
+				
 				IdComponent ic = im.get(entity);
+				StateComponent sc = sm.get(entity);
+				
 				if(ic.id != r.id){
-					
+					if(r.move == MoveType.JAB){
+						EnergyComponent ec = em.get(entity);
+						if(ec.energy > ec.MAX_ENERGY * .5f){
+							ec.energy -= getDamage(sc, MoveType.JAB);
+						}
+					}else{
+						
+					}
 				}
 			}
 		}
 		
 	}
-
-	private int getDamage(MoveType move){
+	
+	private int getDamage(StateComponent stateComponent, MoveType move){
+		
+		int damage = 0;
+		PlayerState state = stateComponent.state;
 		
 		if(move == MoveType.JAB){
-			return MoveInformation.JAB_DAMAGE;
+			
+			damage = MoveInformation.JAB_DAMAGE;
+			if(PlayerState.BLOCKING == state){
+				return 0;
+			}
+			
 		}else if(move == MoveType.CROSS){
-			return MoveInformation.CROSS_DAMAGE;
+			
+			damage = MoveInformation.CROSS_DAMAGE;
+			if(PlayerState.JABBING == state){
+				damage *= MoveInformation.CROSS_MOD;
+			}
+			
 		}else if(move == MoveType.UPPERCUT){
-			return MoveInformation.UPPERCUT_DAMAGE;
+			
+			damage = MoveInformation.UPPERCUT_DAMAGE;
+			stateComponent.state = PlayerState.WEAKEND;
+			
+			
 		}else if(move == MoveType.HOOK){
-			return MoveInformation.HOOK_DAMAGE;
+			
+			damage = MoveInformation.HOOK_DAMAGE;
+			if(stateComponent.state == PlayerState.BLOCKING){
+				damage *= MoveInformation.HOOK_MOD;
+			}
+			
 		}else if(move == MoveType.COUNTER){
-			return MoveInformation.COUNTER_DAMAGE;
+			
+			if(stateComponent.state != PlayerState.BLOCKING && stateComponent.state != PlayerState.OPEN){
+				damage = MoveInformation.COUNTER_DAMAGE;
+				stateComponent.state = PlayerState.BLOCKING;
+			}
+			
 		}
 		
-		return 0;
+		if(stateComponent.state == PlayerState.WEAKEND){
+			damage *= MoveInformation.WEAKEND_MOD;
+		}
+		
+		return damage;
 		
 	}
 	

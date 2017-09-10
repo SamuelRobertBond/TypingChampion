@@ -18,5 +18,10 @@ public class MoveInformation {
 	public static final int CROSS_COST = 20;
 	public static final int COUNTER_COST = 20;
 	public static final int BLOCK_COST = 5;
+
+	//Damage Modifiers
+	public static final float HOOK_MOD = 1.5f;
+	public static final float CROSS_MOD = 1.5f;
+	public static final int WEAKEND_MOD = 2;
 	
 }
