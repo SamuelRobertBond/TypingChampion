@@ -76,7 +76,6 @@ public class LobbyScreen implements Screen{
 	}
 	
 	private void sendMessage() {
-		
 		if(!field.getText().equals("")){
 			client.getClient().sendTCP(new MessageRequest(field.getText()));
 		}

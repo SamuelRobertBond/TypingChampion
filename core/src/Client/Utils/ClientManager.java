@@ -6,6 +6,8 @@ import java.net.InetAddress;
 import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Client;
 
+import Client.Listeners.MessageResponseListener;
+
 public class ClientManager {
 	
 	private Client client;
@@ -16,6 +18,8 @@ public class ClientManager {
 		client = new Client();
 		GameUtils.serializeKryoObjects(client.getKryo());
 		client.start();
+		
+		addListeners(client);
 		
 		InetAddress address = client.discoverHost(udp, 300);
 		
@@ -32,6 +36,10 @@ public class ClientManager {
 	
 	public Client getClient(){
 		return client;
+	}
+	
+	private void addListeners(Client client) {
+		client.addListener(new MessageResponseListener());
 	}
 	
 }
