@@ -40,7 +40,6 @@ public class LobbyScreen implements Screen{
 	
 	public LobbyScreen(TypingGame game, ClientManager client) {
 		this.game = game;
-		
 		setLobby();
 	}
 	
