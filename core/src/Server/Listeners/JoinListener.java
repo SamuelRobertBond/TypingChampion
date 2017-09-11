@@ -22,8 +22,11 @@ public class JoinListener extends Listener {
 	public void received(Connection connection, Object object) {
 		
 		if(object instanceof JoinRequest){
-			addPlayer(connection, ((JoinRequest)object).name);
-			server.sendToAllTCP(new JoinResponse(((JoinRequest)object).name));
+			
+			JoinRequest r = (JoinRequest)object;
+			
+			addPlayer(connection, r.name);
+			server.sendToAllTCP(new JoinResponse(r.name));
 		}
 		
 	}
