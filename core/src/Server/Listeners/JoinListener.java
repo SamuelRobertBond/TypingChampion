@@ -14,8 +14,9 @@ public class JoinListener extends Listener {
 	private Server server;
 	private HashMap<Integer, ServerPlayer> players;
 	
-	public JoinListener(HashMap<Integer, ServerPlayer> players) {
+	public JoinListener(HashMap<Integer, ServerPlayer> players, Server server) {
 		this.players = players;
+		this.server = server;
 	}
 
 	@Override

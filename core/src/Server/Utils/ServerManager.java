@@ -5,17 +5,20 @@ import java.io.IOException;
 import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Server;
 
+import Client.Listeners.MessageResponseListener;
 import Client.Utils.GameUtils;
+import Server.Listeners.JoinListener;
+import Server.Listeners.MessageListener;
 
 public class ServerManager {
 
 	private Server server;
+	private ServerLobbyWorld world;
 	
 	public ServerManager(int tcp, int udp) {
 		
 		server = new Server();
-		GameUtils.serializeKryoObjects(server.getKryo());
-		
+		GameUtils.serializeKryoObjects(server.getKryo());		
 		server.start();
 		
 		//Binds server
@@ -26,6 +29,8 @@ public class ServerManager {
 			e.printStackTrace();
 		}
 		
+		ServerLobbyWorld world = new ServerLobbyWorld(server);
+		world.addListeners();
 		
 		
 	}
@@ -33,5 +38,6 @@ public class ServerManager {
 	public Server getServer(){
 		return server;
 	}
+	
 	
 }
