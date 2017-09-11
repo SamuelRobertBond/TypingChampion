@@ -8,11 +8,12 @@ import com.esotericsoftware.kryonet.Client;
 
 public class ClientManager {
 	
+	private Client client;
 	private int id;
 
 	public ClientManager(String name, int tcp, int udp) {
 		
-		Client client = new Client();
+		client = new Client();
 		GameUtils.serializeKryoObjects(client.getKryo());
 		client.start();
 		
@@ -27,6 +28,10 @@ public class ClientManager {
 		}
 		
 		id = client.getID();
+	}
+	
+	public Client getClient(){
+		return client;
 	}
 	
 }

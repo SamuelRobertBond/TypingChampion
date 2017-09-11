@@ -11,7 +11,7 @@ public class ServerLobbyWorld {
 	public ServerLobbyWorld(Server server) {
 		
 		this.server = server;
-		joinListener = new JoinListener();
+		//joinListener = new JoinListener();
 		
 		server.addListener(joinListener);
 	}
