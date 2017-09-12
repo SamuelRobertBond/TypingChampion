@@ -3,10 +3,12 @@ package Client.Utils;
 import java.util.LinkedList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
@@ -16,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
@@ -37,8 +40,63 @@ public class MenuManager {
 	private float cellHeight;
 	private float padding;
 	
+	private float menuScale;
+	private int fontSize;
+	
+	public MenuManager(Viewport view, InputMultiplexer in) {
+		
+		menuScale = 1;
+		fontSize = 32;
+		
+		stage = new Stage(view);
+		skin = createBasicSkin();
+		in.addProcessor(stage);
+		
+		buttons = new LinkedList<TextButton>();
+		
+		fillCell = true;
+		
+		cellWidth = 2;
+		cellHeight = 2;
+		
+		padding = 5;
+		
+		table = new Table();
+		
+		table.setFillParent(true);
+		stage.addActor(table);
+		
+	}
+	
+	public MenuManager(Viewport view, int fontSize) {
+		
+		menuScale = 1;
+		this.fontSize = fontSize;
+		
+		stage = new Stage(view);
+		Gdx.input.setInputProcessor(stage);
+		skin = createBasicSkin();
+		
+		buttons = new LinkedList<TextButton>();
+		
+		fillCell = true;
+		
+		cellWidth = 2;
+		cellHeight = 2;
+		
+		padding = 5;
+		
+		table = new Table();
+		
+		table.setFillParent(true);
+		stage.addActor(table);
+		
+	}
 	
 	public MenuManager(Viewport view) {
+		
+		menuScale = 1;
+		fontSize = 32;
 		
 		stage = new Stage(view);
 		Gdx.input.setInputProcessor(stage);
@@ -61,7 +119,6 @@ public class MenuManager {
 	}
 	
 	
-	
 	public void render(float delta){
 		stage.act();
 		stage.draw();
@@ -70,7 +127,7 @@ public class MenuManager {
 	public TextField addTextField(){
 		
 		TextField field = new TextField("", skin);
-		table.add(field).pad(padding).width(cellWidth).height(cellHeight);
+		table.add(field).pad(padding).width(cellWidth * menuScale).height(cellHeight * menuScale);
 		return field;
 		
 	}
@@ -79,19 +136,15 @@ public class MenuManager {
 		fillCell = enable;
 	}
 	
-	public void setFontSize(int size){
-		skin = createBasicSkin();
-	}
-	
 	public void setActorCellSize(float width, float height, Actor actor){
-		Cell cell = table.getCell(actor);
-		cell.width(width);
-		cell.height(height);
+		Cell<Actor> cell = table.getCell(actor);
+		cell.width(width * menuScale);
+		cell.height(height * menuScale);
 	}
 	
 	public void setCellSize(float width, float height){
-		cellWidth = width;
-		cellHeight = height;
+		cellWidth = width * menuScale;
+		cellHeight = height * menuScale;
 	}
 	
 	public void setCellPadding(float padding){
@@ -103,15 +156,21 @@ public class MenuManager {
 		stage.dispose();
 	}
 	
+	public TextArea addTextArea(){
+		TextArea area = new TextArea("", skin);
+		table.add(area).pad(padding).width(cellWidth * menuScale).height(cellHeight * menuScale);
+		return area;
+	}
+	
 	
 	public TextButton addTextButton(String text){
 		
 		TextButton button = new TextButton(text, skin);
 		
 		if(fillCell){
-			table.add(button).pad(padding).width(cellWidth).height(cellHeight);
+			table.add(button).pad(padding).width(cellWidth * menuScale).height(cellHeight * menuScale);
 		}else{
-			table.add(button).width(cellWidth).height(cellHeight).pad(padding).getActor();
+			table.add(button).pad(padding).width(cellWidth * menuScale).height(cellHeight * menuScale);
 		}
 		
 		if(buttons.size() == 0){
@@ -125,7 +184,7 @@ public class MenuManager {
 	
 	public Label addLabel(String text){
 		Label label = new Label(text, skin);
-		table.add(label).pad(padding).width(cellWidth).height(cellHeight);
+		table.add(label).pad(padding).width(cellWidth * menuScale).height(cellHeight * menuScale);
 		return label;
 	}
 	
@@ -133,12 +192,22 @@ public class MenuManager {
 		table.row();
 	}
 	
+	public void setMenuScale(float scale){
+		menuScale = scale;
+	}
+	
+
 	private Skin createBasicSkin(){
 		
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Constants.FONT_FILE);
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-		parameter.size = 32;
-		font = generator.generateFont(parameter);
+		parameter.size = fontSize;
+		parameter.magFilter = TextureFilter.Linear;
+		BitmapFont bigFont = generator.generateFont(parameter);
+		
+		parameter.size = fontSize/2;
+		BitmapFont font = generator.generateFont(parameter);
+		
 		generator.dispose();
 		
 		Skin skin = new Skin();
@@ -156,13 +225,19 @@ public class MenuManager {
 		textStyle.font = skin.getFont("default");
 		skin.add("default", textStyle);
 		
-		Label.LabelStyle labelStyle = new LabelStyle(font, Color.BLACK);
+		Label.LabelStyle labelStyle = new LabelStyle(bigFont, Color.BLACK);
 		skin.add("default", labelStyle);
 		
 		TextField.TextFieldStyle fieldStyle = new TextFieldStyle();
 		fieldStyle.font = font;
-		fieldStyle.fontColor = Color.WHITE;
+		fieldStyle.fontColor = Color.BLACK;
 		fieldStyle.background = skin.newDrawable("background", Color.LIGHT_GRAY);
+		skin.add("default", fieldStyle);
+		
+		TextArea.TextFieldStyle areaStyle = new TextFieldStyle();
+		areaStyle.font = font;
+		areaStyle.fontColor = Color.BLACK;
+		areaStyle.background = skin.newDrawable("background", Color.LIGHT_GRAY);
 		skin.add("default", fieldStyle);
 		
 		return skin;

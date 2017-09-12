@@ -26,8 +26,12 @@ public class JoinListener extends Listener {
 			
 			JoinRequest r = (JoinRequest)object;
 			
-			addPlayer(connection, r.name);
-			server.sendToAllTCP(new JoinResponse(r.name));
+			if(players.size() < 2){
+				addPlayer(connection, r.name);
+				server.sendToAllTCP(new JoinResponse(r.name, true));
+			}else{
+				server.sendToAllTCP(new JoinResponse(r.name, false));
+			}
 		}
 		
 	}

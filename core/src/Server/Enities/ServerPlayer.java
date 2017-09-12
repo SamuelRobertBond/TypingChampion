@@ -16,6 +16,8 @@ public class ServerPlayer extends Entity{
 	private StateComponent stateComponent;
 	private Timer timer;
 	
+	private boolean ready;
+	
 	public ServerPlayer(String name, Connection connection) {
 		
 		timer = new Timer();
@@ -23,6 +25,8 @@ public class ServerPlayer extends Entity{
 		add(new IdComponent(name, connection.getID()));
 		add(new HealthComponent());
 		add(new EnergyComponent());
+		
+		ready = false;
 	}
 
 	public void setStateTimer(int timeout) {
@@ -34,6 +38,14 @@ public class ServerPlayer extends Entity{
 			}
 			
 		}, timeout);
+	}
+
+	public void setReady(boolean ready) {
+		this.ready = ready;
+	}
+
+	public boolean isReady() {
+		return ready;
 	}
 	
 }

@@ -8,7 +8,7 @@ import com.esotericsoftware.kryonet.Server;
 import Client.Listeners.MessageResponseListener;
 import Client.Utils.GameUtils;
 import Server.Listeners.JoinListener;
-import Server.Listeners.MessageListener;
+import Server.Listeners.MessageRequestListener;
 
 public class ServerManager {
 
@@ -26,7 +26,6 @@ public class ServerManager {
 			server.bind(tcp, udp);
 		} catch (IOException e) {
 			Gdx.app.log("ServerManager: ", "Failed to bind ports");
-			e.printStackTrace();
 		}
 		
 		ServerLobbyWorld world = new ServerLobbyWorld(server);

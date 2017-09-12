@@ -51,13 +51,14 @@ public class MenuScreen implements Screen{
 			public void changed(ChangeEvent event, Actor actor) {
 				
 				if(!field.getText().equals("")){
-					setClient(field.getMessageText());
+					setClient(field.getText());
 					startLobby();
 				}
 				
 			}
 		});
 		menu.row();
+		
 		
 		//Host Button
 		menu.addTextButton("Host").addListener(new ChangeListener(){
@@ -109,7 +110,7 @@ public class MenuScreen implements Screen{
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(1, 0, 0, 1);
+		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		menu.render(delta);

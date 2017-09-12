@@ -11,7 +11,7 @@ import Client.Listeners.MessageResponseListener;
 public class ClientManager {
 	
 	private Client client;
-	private int id;
+	public String name;
 
 	public ClientManager(String name, int tcp, int udp) {
 		
@@ -19,27 +19,21 @@ public class ClientManager {
 		GameUtils.serializeKryoObjects(client.getKryo());
 		client.start();
 		
-		addListeners(client);
-		
 		InetAddress address = client.discoverHost(udp, 300);
 		
 		//Client Connecting to server
 		try {
-			client.connect(400, address, tcp);
+			client.connect(400, address, tcp, udp);
 		} catch (IOException e) {
 			Gdx.app.log("ClientManager", "Failed to connect to a client");
 			e.printStackTrace();
 		}
 		
-		id = client.getID();
+		this.name = name;
 	}
 	
 	public Client getClient(){
 		return client;
-	}
-	
-	private void addListeners(Client client) {
-		client.addListener(new MessageResponseListener());
 	}
 	
 }
