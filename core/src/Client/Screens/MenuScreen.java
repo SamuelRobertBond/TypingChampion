@@ -25,11 +25,10 @@ public class MenuScreen implements Screen{
 	private MenuManager menu;
 	
 	private ServerManager server;
-	private ClientManager client;
 	
 	public MenuScreen(TypingGame game) {
 		this.game = game;
-		view = new StretchViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		view = new StretchViewport(Constants.V_WIDTH, Constants.V_HEIGHT);
 		
 		menu = new MenuManager(view);
 		
@@ -52,7 +51,6 @@ public class MenuScreen implements Screen{
 				
 				if(!field.getText().equals("")){
 					setClient(field.getText());
-					startLobby();
 				}
 				
 			}
@@ -67,9 +65,7 @@ public class MenuScreen implements Screen{
 			public void changed(ChangeEvent event, Actor actor) {
 				
 				if(!field.getText().equals("")){
-					setServer();
-					setClient(field.getText());
-					startLobby();
+					setServer(field.getText());
 				}
 				
 			}
@@ -85,21 +81,19 @@ public class MenuScreen implements Screen{
 		});
 	}
 	
-	private void setServer(){
-		server = new ServerManager(54555, 54777);
+	private void setServer(String name){
+		
+		ServerManager server = new ServerManager(54555, 54777);
+		ClientManager client = new ClientManager();
+		
+		if(server.bind(54555, 54777) && client.connectLan(name, 54555, 54777)){
+			dispose();
+			game.setScreen(new LobbyScreen(game, server, client));
+		}
 	}
 	
 	private void setClient(String name){
-		client = new ClientManager(name, 54555, 54777);
-	}
-	
-	private void startLobby(){
-		this.dispose();
-		if(server != null){
-			game.setScreen(new LobbyScreen(game, server, client));
-		}else{
-			game.setScreen(new LobbyScreen(game, client));
-		}
+		game.setScreen(new ConnectionScreen(game, name));
 	}
 	
 	@Override

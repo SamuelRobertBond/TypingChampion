@@ -16,11 +16,15 @@ public class ServerPlayer extends Entity{
 	private StateComponent stateComponent;
 	private Timer timer;
 	
+	private String name;
+	
 	private boolean ready;
 	
 	public ServerPlayer(String name, Connection connection) {
 		
 		timer = new Timer();
+		
+		this.name = name;
 		
 		add(new IdComponent(name, connection.getID()));
 		add(new HealthComponent());
@@ -46,6 +50,10 @@ public class ServerPlayer extends Entity{
 
 	public boolean isReady() {
 		return ready;
+	}
+
+	public String getName() {
+		return name;
 	}
 	
 }

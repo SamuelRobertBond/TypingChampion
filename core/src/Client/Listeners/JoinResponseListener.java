@@ -20,6 +20,7 @@ public class JoinResponseListener extends Listener{
 	@Override
 	public void received(Connection connection, Object object) {
 		if(object instanceof JoinResponse){
+			
 			JoinResponse r = (JoinResponse)object;
 			
 			if(r.success){

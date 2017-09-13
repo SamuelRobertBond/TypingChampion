@@ -3,6 +3,7 @@ package Client.Screens;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
@@ -10,11 +11,15 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import com.tdg.gdx.TypingGame;
 
 import Client.Entities.ClientPlayer;
@@ -22,11 +27,13 @@ import Client.Listeners.JoinResponseListener;
 import Client.Listeners.MessageResponseListener;
 import Client.Requests.JoinRequest;
 import Client.Requests.MessageRequest;
+import Client.Requests.ReadyRequest;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
 import Client.Utils.MenuManager;
-import Server.Listeners.JoinListener;
+import Server.Listeners.JoinRequestListener;
 import Server.Listeners.MessageRequestListener;
+import Server.Responses.StartResponse;
 import Server.Utils.ServerManager;
 
 public class LobbyScreen implements Screen{
@@ -69,6 +76,25 @@ public class LobbyScreen implements Screen{
 		
 		client.getClient().addListener(new JoinResponseListener(players));
 		client.getClient().addListener(new MessageResponseListener(area));
+		
+		client.getClient().addListener(new Listener(){
+			
+			@Override
+			public void received(Connection connection, Object object) {
+				if(object instanceof StartResponse){
+					startGame();
+				}
+			}
+			
+		});
+		
+	}
+	
+	private void startGame(){
+		
+		this.dispose();
+		game.setScreen(new GameScreen(game, players, client, server));
+		
 	}
 	
 	private void setLobby(){
@@ -105,22 +131,33 @@ public class LobbyScreen implements Screen{
 		
 		TextButton ready = menu.addTextButton("Ready");
 		
+		ready.addListener(new ChangeListener(){
+			
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {	
+				client.getClient().sendTCP(new JoinRequest(client.name));
+			}
+			
+		});
+		
 		menu.setActorCellSize(160, 40, send);
 		menu.setActorCellSize(160, 40, ready);
 		
-		//Keyboard listener for text
-		in.addProcessor(new InputAdapter(){
-
+		field.addCaptureListener(new InputListener(){
+			
 			@Override
-			public boolean keyDown(int keycode) {
+			public boolean keyDown(InputEvent event, int keycode) {
 				
-				if(keycode == Keys.ENTER){
+				if(keycode == Input.Keys.ENTER){
 					sendMessage();
 				}
 				
 				return false;
 			}
+			
 		});
+		
+		menu.getStage().setKeyboardFocus(field);
 		
 		Gdx.input.setInputProcessor(in);
 		

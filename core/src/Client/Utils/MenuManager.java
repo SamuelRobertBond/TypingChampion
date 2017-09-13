@@ -118,6 +118,16 @@ public class MenuManager {
 		
 	}
 	
+	public Table addTable(){
+		
+		Table table = new Table();
+		table.setFillParent(true);
+		table.setVisible(false);
+		
+		stage.addActor(table);
+		
+		return table;
+	}
 	
 	public void render(float delta){
 		stage.act();
@@ -125,6 +135,14 @@ public class MenuManager {
 	}
 	
 	public TextField addTextField(){
+		
+		TextField field = new TextField("", skin);
+		table.add(field).pad(padding).width(cellWidth * menuScale).height(cellHeight * menuScale);
+		return field;
+		
+	}
+	
+	public TextField addTextField(Table table){
 		
 		TextField field = new TextField("", skin);
 		table.add(field).pad(padding).width(cellWidth * menuScale).height(cellHeight * menuScale);
@@ -162,8 +180,32 @@ public class MenuManager {
 		return area;
 	}
 	
+	public TextArea addTextArea(Table table){
+		TextArea area = new TextArea("", skin);
+		table.add(area).pad(padding).width(cellWidth * menuScale).height(cellHeight * menuScale);
+		return area;
+	}
 	
 	public TextButton addTextButton(String text){
+		
+		TextButton button = new TextButton(text, skin);
+		
+		if(fillCell){
+			table.add(button).pad(padding).width(cellWidth * menuScale).height(cellHeight * menuScale);
+		}else{
+			table.add(button).pad(padding).width(cellWidth * menuScale).height(cellHeight * menuScale);
+		}
+		
+		if(buttons.size() == 0){
+			button.setColor(Color.DARK_GRAY);
+		}
+		
+		buttons.add(button);
+		
+		return button;
+	}
+	
+	public TextButton addTextButton(Table table, String text){
 		
 		TextButton button = new TextButton(text, skin);
 		
@@ -188,6 +230,12 @@ public class MenuManager {
 		return label;
 	}
 	
+	public Label addLabel(Table table, String text){
+		Label label = new Label(text, skin);
+		table.add(label).pad(padding).width(cellWidth * menuScale).height(cellHeight * menuScale);
+		return label;
+	}
+	
 	public void row(){
 		table.row();
 	}
@@ -196,6 +244,13 @@ public class MenuManager {
 		menuScale = scale;
 	}
 	
+	public Table getMainTable(){
+		return table;
+	}
+	
+	public Stage getStage(){
+		return stage;
+	}
 
 	private Skin createBasicSkin(){
 		
@@ -243,7 +298,6 @@ public class MenuManager {
 		return skin;
 	}
 
-	
 	public void resize(int width, int height) {
 		stage.getViewport().update(width, height);
 	}

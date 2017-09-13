@@ -5,11 +5,11 @@ import com.esotericsoftware.kryo.Kryo;
 import Client.Requests.JoinRequest;
 import Client.Requests.MessageRequest;
 import Client.Requests.MoveRequest;
-import Client.Requests.WordRequest;
+import Client.Requests.WordSubmissionRequest;
 import Server.Responses.JoinResponse;
 import Server.Responses.MessageResponse;
 import Server.Responses.MoveResponse;
-import Server.Responses.WordResponse;
+import Server.Responses.WordSubmissionResponse;
 
 public class GameUtils {
 
@@ -24,8 +24,8 @@ public class GameUtils {
 		kryo.register(JoinRequest.class);
 		kryo.register(JoinResponse.class);
 		
-		kryo.register(WordRequest.class);
-		kryo.register(WordResponse.class);
+		kryo.register(WordSubmissionRequest.class);
+		kryo.register(WordSubmissionResponse.class);
 		
 	}
 	

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import com.esotericsoftware.kryonet.Server;
 
 import Server.Enities.ServerPlayer;
-import Server.Listeners.JoinListener;
+import Server.Listeners.JoinRequestListener;
 import Server.Listeners.MessageRequestListener;
 
 public class ServerLobbyWorld {
@@ -22,7 +22,7 @@ public class ServerLobbyWorld {
 	
 	public void addListeners() {
 		server.addListener(new MessageRequestListener(server));
-		server.addListener(new JoinListener(players, server));
+		server.addListener(new JoinRequestListener(players, server));
 	}
 	
 	

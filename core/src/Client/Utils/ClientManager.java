@@ -13,25 +13,50 @@ public class ClientManager {
 	private Client client;
 	public String name;
 
-	public ClientManager(String name, int tcp, int udp) {
+	public ClientManager() {
 		
 		client = new Client();
 		GameUtils.serializeKryoObjects(client.getKryo());
 		client.start();
 		
+	}
+	
+	public boolean connectLan(String name, int tcp, int udp){
+		
 		InetAddress address = client.discoverHost(udp, 300);
 		
-		//Client Connecting to server
 		try {
 			client.connect(400, address, tcp, udp);
 		} catch (IOException e) {
 			Gdx.app.log("ClientManager", "Failed to connect to a client");
-			e.printStackTrace();
+			return false;
 		}
 		
 		this.name = name;
+		return true;
+		
 	}
 	
+	public boolean connectNet(String name, String address, int tcp, int udp){
+		
+		try {
+			client.connect(400, address, tcp, udp);
+		} catch (IOException e) {
+			Gdx.app.log("ClientManager", "Failed to connect to a client");
+			return false;
+		}
+		
+		this.name = name;
+		return true;
+		
+	}
+	
+	
+	public ClientManager(String name, String address, int tcp, int udp) {
+		
+		
+	}
+
 	public Client getClient(){
 		return client;
 	}
