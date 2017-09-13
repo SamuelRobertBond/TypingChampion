@@ -43,6 +43,7 @@ public class ClientManager {
 			client.connect(400, address, tcp, udp);
 		} catch (IOException e) {
 			Gdx.app.log("ClientManager", "Failed to connect to a client");
+			e.printStackTrace();
 			return false;
 		}
 		
