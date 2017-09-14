@@ -1,6 +1,6 @@
 package Client.Screens;
 
-import java.util.HashMap;
+import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -10,12 +10,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import com.tdg.gdx.TypingGame;
 
-import Client.Entities.ClientPlayer;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
 import Client.Utils.MenuManager;
+import Server.Responses.JoinResponse;
 
 public class ConnectionScreen implements Screen{
 
@@ -29,12 +31,15 @@ public class ConnectionScreen implements Screen{
 	private ClientManager clientManager;
 	
 	private String name;
+	
+	private Stack<Listener> listeners;
 
 	
 	public ConnectionScreen(TypingGame game, String name) {
 		
 		this.game = game;
 		view = new StretchViewport(Constants.V_WIDTH, Constants.V_HEIGHT);
+		listeners = new Stack<Listener>();
 		
 		clientManager = new ClientManager();
 		
@@ -111,7 +116,33 @@ public class ConnectionScreen implements Screen{
 			
 		});
 		
+		listeners.push(new Listener(){
+			
+			@Override
+			public void received(Connection connection, Object object) {
+				
+				if(object instanceof JoinResponse){
+					
+					JoinResponse r = (JoinResponse)object;
+					
+					if(r.success){
+						joinLobby();
+					}
+					
+				}
+				
+			}
+			
+		});
+
+		clientManager.getClient().addListener(listeners.peek());
 		
+		
+	}
+	
+	private void joinLobby(){
+		dispose();
+		game.setScreen(new LobbyScreen(game, clientManager));
 	}
 	
 	private void popupOff() {
@@ -120,6 +151,7 @@ public class ConnectionScreen implements Screen{
 	}
 	
 	private void back(){
+		dispose();
 		game.setScreen(new MenuScreen(game));
 	}
 	
@@ -193,7 +225,13 @@ public class ConnectionScreen implements Screen{
 
 	@Override
 	public void dispose() {
+		
 		menu.dispose();
+		
+		while(!listeners.isEmpty()){
+			clientManager.getClient().removeListener(listeners.pop());
+		}
+		
 	}
 	
 }

@@ -27,7 +27,7 @@ public class GameScreen implements Screen{
 	private HashMap<String, ClientPlayer> players;
 	
 
-	public GameScreen(TypingGame game, HashMap<String, ClientPlayer> players, ClientManager client, ServerManager server) {
+	public GameScreen(TypingGame game, ClientManager client, ServerManager server) {
 		
 		this.game = game;
 		this.server = server;

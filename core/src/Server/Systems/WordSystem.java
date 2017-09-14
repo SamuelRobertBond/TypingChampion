@@ -1,5 +1,7 @@
 package Server.Systems;
 
-public class WordSystem {
+import com.badlogic.gdx.Gdx;
 
+public class WordSystem {
+	
 }

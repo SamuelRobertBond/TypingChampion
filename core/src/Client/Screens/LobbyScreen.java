@@ -1,6 +1,7 @@
 package Client.Screens;
 
 import java.util.HashMap;
+import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -20,11 +21,9 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.tdg.gdx.TypingGame;
 
-import Client.Entities.ClientPlayer;
-import Client.Listeners.JoinResponseListener;
 import Client.Listeners.MessageResponseListener;
-import Client.Requests.JoinRequest;
 import Client.Requests.MessageRequest;
+import Client.Requests.ReadyRequest;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
 import Client.Utils.MenuManager;
@@ -40,7 +39,9 @@ public class LobbyScreen implements Screen{
 
 	private StretchViewport view;
 	
-	private HashMap<String, ClientPlayer> players;
+	private boolean ready;
+	
+	private Stack<Listener> listeners;
 	
 	private MenuManager menu;
 
@@ -48,20 +49,19 @@ public class LobbyScreen implements Screen{
 	private TextArea area;
 	
 	private InputMultiplexer in;
+
 	
 	public LobbyScreen(TypingGame game, ServerManager server, ClientManager client) {
 		
 		this.game = game;
+		
+		this.listeners = new Stack<Listener>();
 		
 		this.server = server;
 		this.client = client;
 		
 		setLobby();
 		
-		HashMap<String, ClientPlayer> players = new HashMap<String, ClientPlayer>();
-		
-		client.getClient().addListener(new JoinResponseListener(players));
-		client.getClient().addListener(new MessageResponseListener(area));
 	}
 	
 	public LobbyScreen(TypingGame game, ClientManager client) {
@@ -69,39 +69,27 @@ public class LobbyScreen implements Screen{
 		this.game = game;
 		this.client = client;
 		
+		this.listeners = new Stack<Listener>();
+		
 		setLobby();
-		
-		HashMap<String, ClientPlayer> players = new HashMap<String, ClientPlayer>();
-		
-		client.getClient().addListener(new JoinResponseListener(players));
-		client.getClient().addListener(new MessageResponseListener(area));
-		
-		client.getClient().addListener(new Listener(){
-			
-			@Override
-			public void received(Connection connection, Object object) {
-				if(object instanceof StartResponse){
-					startGame();
-				}
-			}
-			
-		});
 		
 	}
 	
 	private void startGame(){
 		
 		this.dispose();
-		game.setScreen(new GameScreen(game, players, client, server));
+		game.setScreen(new GameScreen(game, client, server));
 		
 	}
 	
 	private void setLobby(){
 		
 		in = new InputMultiplexer();
+		ready = false;
 		
 		view = new StretchViewport(Constants.V_WIDTH, Constants.V_HEIGHT);
 		
+		//Menu 
 		menu = new MenuManager(view, in);
 		
 		menu.setCellSize(320, 34);
@@ -158,13 +146,48 @@ public class LobbyScreen implements Screen{
 		});
 		
 		menu.getStage().setKeyboardFocus(field);
+				
+		//Start Listener
+		listeners.push(new Listener(){
+			
+			@Override
+			public void received(Connection connection, Object object) {
+				if(object instanceof StartResponse){
+					startGame();
+				}
+			}
+			
+		});
+		client.getClient().addListener(listeners.peek());
+		
+		//Message Listener
+		listeners.push(new MessageResponseListener(area));
+		client.getClient().addListener(listeners.peek());
+		
+		//Ready Listener
+		listeners.push(new Listener(){
+			
+			@Override
+			public void received(Connection connection, Object object) {
+				
+				if(object instanceof StartResponse){
+					
+					dispose();
+					game.setScreen(new GameScreen(game, client, server));
+					
+				}
+				
+			}
+			
+		});
+		client.getClient().addListener(listeners.peek());
 		
 		Gdx.input.setInputProcessor(in);
 		
 	}
 	
 	private void setReady(){
-		client.getClient().sendTCP(new JoinRequest(client.name));
+		client.getClient().sendTCP(new ReadyRequest(!ready));
 	}
 	
 	private void sendMessage() {
@@ -218,7 +241,10 @@ public class LobbyScreen implements Screen{
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
+		
+		while(!listeners.isEmpty()){
+			client.getClient().removeListener(listeners.pop());
+		}
 		
 	}
 
