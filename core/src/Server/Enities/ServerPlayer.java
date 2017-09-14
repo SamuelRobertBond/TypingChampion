@@ -25,12 +25,12 @@ public class ServerPlayer extends Entity{
 		timer = new Timer();
 		
 		this.name = name;
+		this.ready = false;
 		
 		add(new IdComponent(name, connection.getID()));
 		add(new HealthComponent());
 		add(new EnergyComponent());
 		
-		ready = false;
 	}
 
 	public void setStateTimer(int timeout) {

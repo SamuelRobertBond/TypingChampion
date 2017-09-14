@@ -39,8 +39,6 @@ public class LobbyScreen implements Screen{
 
 	private StretchViewport view;
 	
-	private boolean ready;
-	
 	private Stack<Listener> listeners;
 	
 	private MenuManager menu;
@@ -85,7 +83,6 @@ public class LobbyScreen implements Screen{
 	private void setLobby(){
 		
 		in = new InputMultiplexer();
-		ready = false;
 		
 		view = new StretchViewport(Constants.V_WIDTH, Constants.V_HEIGHT);
 		
@@ -187,13 +184,13 @@ public class LobbyScreen implements Screen{
 	}
 	
 	private void setReady(){
-		client.getClient().sendTCP(new ReadyRequest(!ready));
+		client.getClient().sendTCP(new ReadyRequest());
 	}
 	
 	private void sendMessage() {
 		
 		if(!field.getText().equals("")){
-			Gdx.app.log("LobbyScreen - Sending Message", client.name + ": " + field.getText());
+			//Gdx.app.log("LobbyScreen - Sending Message", client.name + ": " + field.getText());
 			
 			area.appendText(client.name + ": " + field.getText() + "\n");
 			client.getClient().sendTCP(new MessageRequest(client.name, field.getText()));

@@ -12,8 +12,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.tdg.gdx.TypingGame;
 
+import Client.Requests.JoinRequest;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
 import Client.Utils.MenuManager;
@@ -33,15 +35,17 @@ public class ConnectionScreen implements Screen{
 	private String name;
 	
 	private Stack<Listener> listeners;
+	
+	private boolean changeScreen;
 
 	
 	public ConnectionScreen(TypingGame game, String name) {
-		
+				
 		this.game = game;
 		view = new StretchViewport(Constants.V_WIDTH, Constants.V_HEIGHT);
 		listeners = new Stack<Listener>();
 		
-		clientManager = new ClientManager();
+		clientManager = new ClientManager(name);
 		
 		menu = new MenuManager(view);
 		
@@ -108,14 +112,12 @@ public class ConnectionScreen implements Screen{
 			
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				
-				dispose();
 				back();
-				
 			}
 			
 		});
 		
+		//Join Response Listener
 		listeners.push(new Listener(){
 			
 			@Override
@@ -134,15 +136,14 @@ public class ConnectionScreen implements Screen{
 			}
 			
 		});
-
 		clientManager.getClient().addListener(listeners.peek());
 		
+		changeScreen = false;
 		
 	}
 	
 	private void joinLobby(){
-		dispose();
-		game.setScreen(new LobbyScreen(game, clientManager));
+		changeScreen = true;
 	}
 	
 	private void popupOff() {
@@ -158,17 +159,15 @@ public class ConnectionScreen implements Screen{
 	private void connect(String addr){
 		
 		if(clientManager.connectNet(name, addr, 54555, 54777)){
-			game.setScreen(new LobbyScreen(game, clientManager));
+			clientManager.getClient().sendTCP(new JoinRequest(name));
 		}
 		
 	}
 	
-	
 	private void localGame(){
-		this.dispose();
 		
 		if(clientManager.connectLan(name, 54555, 54777)){
-			game.setScreen(new LobbyScreen(game, clientManager));
+			clientManager.getClient().sendTCP(new JoinRequest(name));
 		}
 			
 	}
@@ -192,6 +191,12 @@ public class ConnectionScreen implements Screen{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		menu.render(delta);
+		
+		if(changeScreen){
+			dispose();
+			game.setScreen(new LobbyScreen(game, clientManager));
+		}
+		
 	}
 
 

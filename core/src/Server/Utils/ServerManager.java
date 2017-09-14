@@ -2,15 +2,10 @@ package Server.Utils;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
-
 import com.badlogic.gdx.Gdx;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
 import Client.Utils.GameUtils;
-import Server.Responses.StartRequest;
 
 public class ServerManager {
 
@@ -38,6 +33,7 @@ public class ServerManager {
 		//Binds server
 		try {
 			server.bind(tcp, udp);
+			setupServer();
 		} catch (IOException e) {
 			Gdx.app.log("ServerManager: ", "Failed to bind ports");
 			return false;

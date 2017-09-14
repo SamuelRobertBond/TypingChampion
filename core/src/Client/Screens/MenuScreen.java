@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.tdg.gdx.TypingGame;
 
+import Client.Requests.JoinRequest;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
 import Client.Utils.MenuManager;
@@ -27,6 +28,7 @@ public class MenuScreen implements Screen{
 	private ServerManager server;
 	
 	public MenuScreen(TypingGame game) {
+		
 		this.game = game;
 		view = new StretchViewport(Constants.V_WIDTH, Constants.V_HEIGHT);
 		
@@ -84,10 +86,10 @@ public class MenuScreen implements Screen{
 	private void setServer(String name){
 		
 		ServerManager server = new ServerManager(54555, 54777);
-		ClientManager client = new ClientManager();
+		ClientManager client = new ClientManager(name);
 		
 		if(server.bind(54555, 54777) && client.connectLan(name, 54555, 54777)){
-			dispose();
+			client.getClient().sendTCP(new JoinRequest(name));
 			game.setScreen(new LobbyScreen(game, server, client));
 		}
 	}

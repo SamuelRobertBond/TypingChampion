@@ -13,11 +13,13 @@ public class ClientManager {
 	private Client client;
 	public String name;
 
-	public ClientManager() {
+	public ClientManager(String name) {
 		
 		client = new Client();
 		GameUtils.serializeKryoObjects(client.getKryo());
 		client.start();
+		
+		this.name = name;
 		
 	}
 	

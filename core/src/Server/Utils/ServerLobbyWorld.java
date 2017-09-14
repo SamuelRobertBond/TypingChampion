@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Stack;
 
+import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -28,6 +29,8 @@ public class ServerLobbyWorld {
 		this.server = server;
 		players = new HashMap<Integer, ServerPlayer>();
 		
+		games = new LinkedList<ServerGameWorld>();
+		
 		listeners = new Stack<Listener>();
 		
 		//Message Listener
@@ -45,7 +48,7 @@ public class ServerLobbyWorld {
 			public void received(Connection connection, Object object) {
 				
 				if(object instanceof ReadyRequest){
-					
+								
 					players.get(connection.getID()).setReady(!players.get(connection.getID()).isReady());
 					
 					if(players.get(connection.getID()).isReady()){
@@ -64,6 +67,8 @@ public class ServerLobbyWorld {
 	private void startGame(Connection connection){
 		
 		ServerPlayer player = players.get(connection.getID());
+		
+		Gdx.app.log("Server Lobby World", player.getName() + " is ready");
 		
 		//Check for games to start
 		for(int key : players.keySet()){
