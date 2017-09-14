@@ -26,13 +26,14 @@ public class ClientManager {
 		InetAddress address = client.discoverHost(udp, 300);
 		
 		try {
-			client.connect(400, address, tcp, udp);
+			client.connect(5000, address, tcp, udp);
 		} catch (IOException e) {
 			Gdx.app.log("ClientManager", "Failed to connect to a client");
 			return false;
 		}
 		
 		this.name = name;
+		
 		return true;
 		
 	}
@@ -40,7 +41,7 @@ public class ClientManager {
 	public boolean connectNet(String name, String address, int tcp, int udp){
 		
 		try {
-			client.connect(400, address, tcp, udp);
+			client.connect(5000, address, tcp, udp);
 		} catch (IOException e) {
 			Gdx.app.log("ClientManager", "Failed to connect to a client");
 			e.printStackTrace();
@@ -49,12 +50,6 @@ public class ClientManager {
 		
 		this.name = name;
 		return true;
-		
-	}
-	
-	
-	public ClientManager(String name, String address, int tcp, int udp) {
-		
 		
 	}
 

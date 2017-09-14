@@ -24,6 +24,8 @@ public class GameScreen implements Screen{
 	
 	private GameWorld world;
 	
+	private HashMap<String, ClientPlayer> players;
+	
 
 	public GameScreen(TypingGame game, HashMap<String, ClientPlayer> players, ClientManager client, ServerManager server) {
 		
@@ -33,7 +35,8 @@ public class GameScreen implements Screen{
 		
 		view = new StretchViewport(Constants.V_WIDTH, Constants.V_HEIGHT);
 		
-		world = new GameWorld(view, client, null);
+		players = new HashMap<String, ClientPlayer>();
+		world = new GameWorld(view, client, players);
 		
 	}
 

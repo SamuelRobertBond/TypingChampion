@@ -19,10 +19,7 @@ public class ServerManager {
 		
 		server = new Server();
 		GameUtils.serializeKryoObjects(server.getKryo());		
-		server.start();
-		
-		
-		
+		server.start();	
 		
 	}
 	

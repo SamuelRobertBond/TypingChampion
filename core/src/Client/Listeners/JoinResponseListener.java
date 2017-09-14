@@ -3,6 +3,7 @@ package Client.Listeners;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
@@ -11,7 +12,7 @@ import Server.Responses.JoinResponse;
 
 public class JoinResponseListener extends Listener{
 	
-	HashMap<String, ClientPlayer> players;
+	private HashMap<String, ClientPlayer> players;
 	
 	public JoinResponseListener(HashMap<String, ClientPlayer> players) {
 		this.players = players;

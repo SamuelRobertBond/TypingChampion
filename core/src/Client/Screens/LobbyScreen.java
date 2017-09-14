@@ -5,14 +5,12 @@ import java.util.HashMap;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -27,12 +25,9 @@ import Client.Listeners.JoinResponseListener;
 import Client.Listeners.MessageResponseListener;
 import Client.Requests.JoinRequest;
 import Client.Requests.MessageRequest;
-import Client.Requests.ReadyRequest;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
 import Client.Utils.MenuManager;
-import Server.Listeners.JoinRequestListener;
-import Server.Listeners.MessageRequestListener;
 import Server.Responses.StartResponse;
 import Server.Utils.ServerManager;
 
@@ -63,6 +58,8 @@ public class LobbyScreen implements Screen{
 		
 		setLobby();
 		
+		HashMap<String, ClientPlayer> players = new HashMap<String, ClientPlayer>();
+		
 		client.getClient().addListener(new JoinResponseListener(players));
 		client.getClient().addListener(new MessageResponseListener(area));
 	}
@@ -73,6 +70,8 @@ public class LobbyScreen implements Screen{
 		this.client = client;
 		
 		setLobby();
+		
+		HashMap<String, ClientPlayer> players = new HashMap<String, ClientPlayer>();
 		
 		client.getClient().addListener(new JoinResponseListener(players));
 		client.getClient().addListener(new MessageResponseListener(area));
@@ -110,6 +109,7 @@ public class LobbyScreen implements Screen{
 		menu.row();
 		
 		area = menu.addTextArea();
+		area.setTouchable(Touchable.disabled);
 		menu.setActorCellSize(320, 200, area);
 		menu.row();
 		
@@ -135,7 +135,7 @@ public class LobbyScreen implements Screen{
 			
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {	
-				client.getClient().sendTCP(new JoinRequest(client.name));
+				setReady();
 			}
 			
 		});
@@ -161,6 +161,10 @@ public class LobbyScreen implements Screen{
 		
 		Gdx.input.setInputProcessor(in);
 		
+	}
+	
+	private void setReady(){
+		client.getClient().sendTCP(new JoinRequest(client.name));
 	}
 	
 	private void sendMessage() {

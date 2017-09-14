@@ -160,6 +160,12 @@ public class MenuManager {
 		cell.height(height * menuScale);
 	}
 	
+	public void setActorCellSize(Table table, float width, float height, Actor actor){
+		Cell<Actor> cell = table.getCell(actor);
+		cell.width(width * menuScale);
+		cell.height(height * menuScale);
+	}
+	
 	public void setCellSize(float width, float height){
 		cellWidth = width * menuScale;
 		cellHeight = height * menuScale;

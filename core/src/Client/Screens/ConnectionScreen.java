@@ -1,5 +1,7 @@
 package Client.Screens;
 
+import java.util.HashMap;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -10,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.tdg.gdx.TypingGame;
 
+import Client.Entities.ClientPlayer;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
 import Client.Utils.MenuManager;
@@ -66,9 +69,12 @@ public class ConnectionScreen implements Screen{
 		
 		popupTable = menu.addTable();
 		menu.addLabel(popupTable, "IP Address:");
-		menu.row();
+		popupTable.row();
+		
 		field = menu.addTextField(popupTable);
-		menu.row();
+		menu.setActorCellSize(popupTable, 400, 40, field);
+		
+		popupTable.row();
 		
 		menu.addTextButton(popupTable, "Back").addListener(new ChangeListener(){
 			
