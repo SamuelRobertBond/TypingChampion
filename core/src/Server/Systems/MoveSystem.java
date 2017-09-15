@@ -8,6 +8,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.Gdx;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
 import Client.Requests.MoveRequest;
@@ -17,6 +20,7 @@ import Server.Components.HealthComponent;
 import Server.Components.IdComponent;
 import Server.Components.StateComponent;
 import Server.Enities.ServerPlayer;
+import Server.Responses.StatResponse;
 import Server.Utils.MoveInformation;
 import Server.Utils.PlayerState;
 
@@ -33,8 +37,29 @@ public class MoveSystem extends EntitySystem{
 	
 	private LinkedList<MoveRequest> moves;
 	
+	private Listener moveListener;
+	
 	public MoveSystem(Server server) {
+		
 		this.server = server;
+		
+		moves = new LinkedList<MoveRequest>();
+		
+		//Network Listeners
+		moveListener = new Listener(){
+			
+			@Override
+			public void received(Connection connection, Object object) {
+				
+				if(object instanceof MoveRequest){
+					MoveRequest r = (MoveRequest)object;
+					addMove(r);
+				}
+				
+			}
+			
+		};
+		server.addListener(moveListener);
 	}
 	
 	@Override
@@ -42,11 +67,17 @@ public class MoveSystem extends EntitySystem{
 		entities = engine.getEntitiesFor(Family.all(EnergyComponent.class, HealthComponent.class).get());
 	}
 	
+	private void addMove(MoveRequest r){
+		moves.add(r);
+	}
+	
 	@Override
 	public void update(float deltaTime) {
 		
-		LinkedList<MoveRequest> moves = (LinkedList<MoveRequest>) this.moves.clone(); //Cloned because move requests could be received during processing
-		this.moves.clear();
+		LinkedList<MoveRequest> moves = new LinkedList<MoveRequest>();
+		while(!this.moves.isEmpty()){
+			moves.add(this.moves.pop());
+		}
 		
 		//Checks if all moves can be performed
 		for(Entity entity : entities){
@@ -57,7 +88,7 @@ public class MoveSystem extends EntitySystem{
 				MoveRequest r = moves.get(i);
 				
 				//Check if move can be performed
-				if(ic.id == r.id){
+				if(ic.name.equals(r.name)){
 					
 					//Energy handling
 					EnergyComponent ec = em.get(entity);
@@ -73,14 +104,15 @@ public class MoveSystem extends EntitySystem{
 			
 		}
 		
-		for(MoveRequest r : moves){
+		for(int i = 0; i < entities.size(); ++i){
+		
+			Entity entity = entities.get(i);
 			
-			//Performs moves
-			for(Entity entity : entities){
+			for(MoveRequest r : moves){
 				IdComponent ic = im.get(entity);
 				
 				//Perform moves
-				if(ic.id == r.id){
+				if(ic.name.equals(r.name)){
 					preformMove((ServerPlayer)entity, r);
 				}
 				
@@ -88,38 +120,79 @@ public class MoveSystem extends EntitySystem{
 			
 		}
 		
-		
-		
 		moves.clear();
 		
 	}
 
-	
-	//Performs the specified move
 	private void preformMove(ServerPlayer player, MoveRequest r) {
 		
+		//Checks for blocking
 		if(r.move == MoveType.BLOCK){
 			StateComponent sc = sm.get(player);
 			sc.state =  PlayerState.BLOCKING;
-			player.setStateTimer(1);
+			player.setStateTimer();
 		}else{
-			for(Entity entity : entities){
+			
+			//Check for moves
+			for(int i = 0; i < entities.size(); ++i){
+				
+				Entity entity = entities.get(i);
 				
 				IdComponent ic = im.get(entity);
-				StateComponent sc = sm.get(entity);
 				
-				if(ic.id != r.id){
-					if(r.move == MoveType.JAB){
-						EnergyComponent ec = em.get(entity);
-						if(ec.energy > ec.MAX_ENERGY * .5f){
-							ec.energy -= getDamage(sc, MoveType.JAB);
+				//If the player is not the player performing the move
+				if(!ic.name.equals(r.name)){
+					
+					EnergyComponent ec = em.get(entity);
+					StateComponent sc = sm.get(entity);
+					
+					//Gets the adjusted damage
+					int damage = getDamage(sc, r.move);
+					
+					//Jab Energy Mitigation
+					if(r.move == MoveType.JAB && ec.energy > ec.MAX_ENERGY * .5f){
+						
+						Gdx.app.log("Move System", ic.name + ": Energy -> ( " + ec.energy + ", " + (ec.energy - damage) + ")");
+						
+						ec.energy -= damage;
+						if(ec.energy < 0 ){
+							ec.energy = 0;
 						}
+						
 					}else{
 						
+						//Health Deduction
+						HealthComponent hc = hm.get(entity);
+						Gdx.app.log("Move System", ic.name + ": Health -> ( " + hc.health + ", " + (hc.health - damage) + ")");
+						hc.health -= damage;
+						
+						if(hc.health < 0){
+							hc.health = 0;
+						}
+						
+						//Response Systems
+						
+						//Attacker update
+						sendStats(player, sc.state);
+						
+						//Defender update
+						sc = sm.get(player);
+						sendStats(entity, sc.state);
 					}
 				}
 			}
 		}
+		
+	}
+	
+	private void sendStats(Entity player, PlayerState enemyState){
+		
+		StateComponent sc = sm.get(player);
+		HealthComponent hc = hm.get(player);
+		EnergyComponent ec = em.get(player);
+		IdComponent ic = im.get(player);
+		
+		server.sendToTCP(ic.id, new StatResponse(hc.health, ec.energy, sc.state, enemyState));
 		
 	}
 	
@@ -191,5 +264,8 @@ public class MoveSystem extends EntitySystem{
 		return MoveInformation.MAX_ENERGY + 1; 
 	}
 	
+	public void dispose(){
+		server.removeListener(moveListener);
+	}
 	
 }

@@ -29,6 +29,7 @@ import Client.Utils.Constants;
 import Client.Utils.MenuManager;
 import Server.Responses.StartResponse;
 import Server.Utils.ServerManager;
+import Server.Utils.WordUtil;
 
 public class LobbyScreen implements Screen{
 
@@ -42,12 +43,12 @@ public class LobbyScreen implements Screen{
 	private Stack<Listener> listeners;
 	
 	private MenuManager menu;
-
 	private TextField field;
 	private TextArea area;
-	
 	private InputMultiplexer in;
 
+	private StartResponse start;
+	
 	
 	public LobbyScreen(TypingGame game, ServerManager server, ClientManager client) {
 		
@@ -58,6 +59,7 @@ public class LobbyScreen implements Screen{
 		this.server = server;
 		this.client = client;
 		
+		WordUtil.initializeWords();
 		setLobby();
 		
 	}
@@ -73,12 +75,6 @@ public class LobbyScreen implements Screen{
 		
 	}
 	
-	private void startGame(){
-		
-		this.dispose();
-		game.setScreen(new GameScreen(game, client, server));
-		
-	}
 	
 	private void setLobby(){
 		
@@ -146,11 +142,11 @@ public class LobbyScreen implements Screen{
 				
 		//Start Listener
 		listeners.push(new Listener(){
-			
+
 			@Override
 			public void received(Connection connection, Object object) {
 				if(object instanceof StartResponse){
-					startGame();
+					start = (StartResponse)object;
 				}
 			}
 			
@@ -161,23 +157,6 @@ public class LobbyScreen implements Screen{
 		listeners.push(new MessageResponseListener(area));
 		client.getClient().addListener(listeners.peek());
 		
-		//Ready Listener
-		listeners.push(new Listener(){
-			
-			@Override
-			public void received(Connection connection, Object object) {
-				
-				if(object instanceof StartResponse){
-					
-					dispose();
-					game.setScreen(new GameScreen(game, client, server));
-					
-				}
-				
-			}
-			
-		});
-		client.getClient().addListener(listeners.peek());
 		
 		Gdx.input.setInputProcessor(in);
 		
@@ -207,9 +186,17 @@ public class LobbyScreen implements Screen{
 
 	@Override
 	public void render(float delta) {
+		
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
 		menu.render(delta);
+		
+		if(start != null){
+			this.dispose();
+			game.setScreen(new GameScreen(game, client, server));
+		}
+		
 	}
 
 	@Override

@@ -99,6 +99,7 @@ public class MenuManager {
 		fontSize = 32;
 		
 		stage = new Stage(view);
+		
 		Gdx.input.setInputProcessor(stage);
 		skin = createBasicSkin();
 		

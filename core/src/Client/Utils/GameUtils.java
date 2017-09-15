@@ -6,12 +6,15 @@ import Client.Requests.JoinRequest;
 import Client.Requests.MessageRequest;
 import Client.Requests.MoveRequest;
 import Client.Requests.ReadyRequest;
+import Client.Requests.StartMatchRequest;
 import Client.Requests.WordSubmissionRequest;
 import Server.Responses.JoinResponse;
 import Server.Responses.MessageResponse;
 import Server.Responses.MoveResponse;
 import Server.Responses.StartResponse;
+import Server.Responses.StatResponse;
 import Server.Responses.WordSubmissionResponse;
+import Server.Utils.PlayerState;
 
 public class GameUtils {
 
@@ -32,6 +35,12 @@ public class GameUtils {
 		kryo.register(ReadyRequest.class);
 		
 		kryo.register(StartResponse.class);
+		
+		kryo.register(StartMatchRequest.class);
+		kryo.register(StatResponse.class);
+		
+		kryo.register(MoveType.class);
+		kryo.register(PlayerState.class);
 		
 	}
 	

@@ -10,6 +10,5 @@ public enum MoveType {
 	
 	//Defense
 	BLOCK,		//Blocks a jab
-	SLIP, 		//Dodges all punches
 	COUNTER,	//If typed quickly before a punch is thrown the punch is dodged and a counter punch is performed
 }

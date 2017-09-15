@@ -4,12 +4,16 @@ import Client.Utils.MoveType;
 
 public class MoveRequest {
 
-	public int id;
+	public String name;
 	public MoveType move;
 
-	public MoveRequest(int id, MoveType move) {
-		this.id = id;
+	public MoveRequest(String name, MoveType move) {
+		this.name = name;
 		this.move = move;
+	}
+	
+	public MoveRequest() {
+		// TODO Auto-generated constructor stub
 	}
 	
 }

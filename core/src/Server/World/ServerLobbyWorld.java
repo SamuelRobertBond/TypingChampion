@@ -1,4 +1,4 @@
-package Server.Utils;
+package Server.World;
 
 import java.util.HashMap;
 import java.util.LinkedList;

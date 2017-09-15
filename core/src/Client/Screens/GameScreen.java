@@ -2,15 +2,18 @@ package Client.Screens;
 
 import java.util.HashMap;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.tdg.gdx.TypingGame;
 
 import Client.Entities.ClientPlayer;
+import Client.Requests.StartMatchRequest;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
 import Client.Utils.MenuManager;
-import Client.Worlds.GameWorld;
+import Client.Worlds.ClientGameWorld;
 import Server.Utils.ServerManager;
 
 public class GameScreen implements Screen{
@@ -22,7 +25,7 @@ public class GameScreen implements Screen{
 	private ClientManager client;
 	private ServerManager server;
 	
-	private GameWorld world;
+	private ClientGameWorld world;
 	
 	private HashMap<String, ClientPlayer> players;
 	
@@ -36,7 +39,9 @@ public class GameScreen implements Screen{
 		view = new StretchViewport(Constants.V_WIDTH, Constants.V_HEIGHT);
 		
 		players = new HashMap<String, ClientPlayer>();
-		world = new GameWorld(view, client, players);
+		world = new ClientGameWorld(view, client, players);
+		
+		client.getClient().sendTCP(new StartMatchRequest());
 		
 	}
 
@@ -48,6 +53,9 @@ public class GameScreen implements Screen{
 
 	@Override
 	public void render(float delta) {
+		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
 		world.render(delta);
 		
 	}
