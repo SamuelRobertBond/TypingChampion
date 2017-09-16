@@ -2,16 +2,21 @@ package Server.World;
 
 import java.util.Stack;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import com.sun.media.jfxmedia.events.PlayerStateEvent.PlayerState;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 import Client.Requests.StartMatchRequest;
+import Server.Components.IdComponent;
+import Server.Components.StateComponent;
 import Server.Enities.ServerPlayer;
 import Server.Responses.WordSubmissionResponse;
 import Server.Systems.MoveSystem;
@@ -63,6 +68,15 @@ public class ServerGameWorld extends EntitySystem{
 			engine.addEntity(player);
 		}
 	
+		completed = false;
+		
+		//Systems
+		wordSystem = new WordSystem(server);
+		moveSystem = new MoveSystem(server);
+		
+		engine.addSystem(wordSystem);
+		engine.addSystem(moveSystem);
+		
 		//Update Settings
 		update = new Timer();
 		update.scheduleAtFixedRate(new TimerTask(){
@@ -74,16 +88,6 @@ public class ServerGameWorld extends EntitySystem{
 			}
 			
 		}, TIME_STEP, TIME_STEP);
-		
-		
-		completed = false;
-		
-		//Systems
-		wordSystem = new WordSystem(server);
-		moveSystem = new MoveSystem(server);
-		
-		engine.addSystem(wordSystem);
-		engine.addSystem(moveSystem);
 		
 	}
 	
@@ -106,6 +110,13 @@ public class ServerGameWorld extends EntitySystem{
 	}
 	
 	private void update(){
+		for(ServerPlayer p : players) {
+			
+			ComponentMapper<StateComponent> sm = ComponentMapper.getFor(StateComponent.class);
+			StateComponent sc = sm.get(p);
+			
+			if(sc.state == PlayerState.KNOCKED_OUT);
+		}
 		engine.update(TIME_STEP);
 	}
 	

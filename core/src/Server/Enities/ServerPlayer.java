@@ -37,7 +37,7 @@ public class ServerPlayer extends Entity{
 		idComponent = new IdComponent(name, connection.getID());
 		healthComponent = new HealthComponent();
 		energyComponent = new EnergyComponent();
-		stateComponent = new StateComponent();
+		stateComponent = new StateComponent(PlayerState.OPEN);
 		wordComponent = new WordComponent("First");
 		
 		add(idComponent);
