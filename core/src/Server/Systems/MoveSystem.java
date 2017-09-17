@@ -169,7 +169,10 @@ public class MoveSystem extends EntitySystem{
 						if(hc.health < 0){
 							hc.health = 0;
 							sc.state =  PlayerState.KNOCKED_OUT;
-							player.setStateTimer();
+							//player.setStateTimer();
+							
+							//server.sendToAllTCP(new KnockoutResponse());
+							
 						}
 						
 						//Response Systems
@@ -264,10 +267,6 @@ public class MoveSystem extends EntitySystem{
 		}
 		
 		return MoveInformation.MAX_ENERGY + 1; 
-	}
-	
-	private void handleKnockout() {
-		
 	}
 	
 	public void dispose(){
