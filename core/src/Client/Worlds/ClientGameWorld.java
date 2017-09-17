@@ -2,8 +2,8 @@ package Client.Worlds;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Queue;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -17,14 +17,19 @@ import com.esotericsoftware.kryonet.Listener;
 import Client.Entities.ClientPlayer;
 import Client.Requests.MoveRequest;
 import Client.Requests.WordSubmissionRequest;
+import Client.Systems.SpriteRenderSystem;
 import Client.Utils.ClientManager;
+import Client.Utils.Constants;
+import Client.Utils.GameUtils;
 import Client.Utils.MenuManager;
 import Client.Utils.MoveType;
+import Client.Utils.Role;
 import Server.Responses.WordSubmissionResponse;
 
 public class ClientGameWorld {
 
 	private ClientManager client;
+	private Engine engine;
 	
 	private LinkedList<Listener> listeners;
 	
@@ -34,13 +39,17 @@ public class ClientGameWorld {
 	private String word;
 	private Label wordLabel;
 	
-	public ClientGameWorld(StretchViewport view, ClientManager client, HashMap<String, ClientPlayer> players) {
+	private HashMap<Role, ClientPlayer> players;
+	private SpriteRenderSystem spriteSystem;
+	
+	private String name;
+	
+	public ClientGameWorld(StretchViewport view, ClientManager client) {
 		
 		this.client = client;		
+		name = client.name;
 		
 		Gdx.app.log("Client World", "Client World Created");
-		
-		//Menu Stuff
 		
 		menu = new MenuManager(view);
 		wordLabel = menu.addLabel("");
@@ -85,8 +94,24 @@ public class ClientGameWorld {
 		});
 		client.getClient().addListener(listeners.peek());
 		
+		//Players
+		players = new HashMap<Role, ClientPlayer>();
+		players.put(Role.Player, new ClientPlayer());
+		players.put(Role.Enemy, new ClientPlayer());
+		
+		//Adds Animations to the player
+		GameUtils.createBoxerAnimation(players.get(Role.Player), Constants.PLAYER_SPRITE_SHEET);
+		GameUtils.createBoxerAnimation(players.get(Role.Enemy), Constants.PLAYER_SPRITE_SHEET);
+		
+		engine = new Engine();
+		
+		engine.addEntity(players.get(Role.Player));
+		engine.addEntity(players.get(Role.Enemy));
+		
+		spriteSystem = new SpriteRenderSystem(name);
+		engine.addSystem(spriteSystem);
 	}
-	
+
 	private void changeWord(String word){
 		this.word = word;
 		this.wordLabel.setText(word);
@@ -124,6 +149,7 @@ public class ClientGameWorld {
 	
 	public void render(float delta) {
 		menu.render(delta);
+		engine.update(delta);
 	}
 	
 	public void dispose(){

@@ -110,8 +110,7 @@ public class LobbyScreen implements Screen{
 			
 		});
 		
-		TextButton ready = menu.addTextButton("Ready");
-		
+		TextButton ready = menu.addTextButton("Ready");		
 		ready.addListener(new ChangeListener(){
 			
 			@Override
@@ -156,7 +155,6 @@ public class LobbyScreen implements Screen{
 		//Message Listener
 		listeners.push(new MessageResponseListener(area));
 		client.getClient().addListener(listeners.peek());
-		
 		
 		Gdx.input.setInputProcessor(in);
 		

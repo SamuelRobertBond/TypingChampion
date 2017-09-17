@@ -37,9 +37,7 @@ public class GameScreen implements Screen{
 		this.client = client;
 		
 		view = new StretchViewport(Constants.V_WIDTH, Constants.V_HEIGHT);
-		
-		players = new HashMap<String, ClientPlayer>();
-		world = new ClientGameWorld(view, client, players);
+		world = new ClientGameWorld(view, client);
 		
 		client.getClient().sendTCP(new StartMatchRequest());
 		

@@ -82,7 +82,7 @@ public class WordSystem extends EntitySystem{
 	public void addedToEngine(Engine engine) {
 		entities = engine.getEntitiesFor(Family.all(WordComponent.class).get());
 	}
-
+	
 	public void dispose() {
 		server.removeListener(wordListener);
 	}

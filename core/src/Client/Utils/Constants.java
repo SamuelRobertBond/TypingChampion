@@ -11,4 +11,9 @@ public class Constants {
 	
 	//Font File
 	public static final FileHandle FONT_FILE = Gdx.files.internal("Fonts/Tahoma.ttf");
+	
+	//Textures
+	public static final FileHandle PLAYER_SPRITE_SHEET = Gdx.files.internal("Spirtes/player.png");
+	public static final FileHandle ENEMY_SPRITE_SHEET = Gdx.files.internal("Spirtes/enemy.png");
+	
 }

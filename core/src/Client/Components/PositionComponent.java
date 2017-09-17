@@ -6,6 +6,7 @@ public class PositionComponent implements Component{
 
 	public float x;
 	public float y;
+	public final float scale = 1;
 	
 	public PositionComponent(float x, float y) {
 		this.x = x;

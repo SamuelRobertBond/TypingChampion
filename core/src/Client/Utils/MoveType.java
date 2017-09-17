@@ -11,4 +11,8 @@ public enum MoveType {
 	//Defense
 	BLOCK,		//Blocks a jab
 	COUNTER,	//If typed quickly before a punch is thrown the punch is dodged and a counter punch is performed
+	
+	//States
+	Idle,
+	Dead,
 }
