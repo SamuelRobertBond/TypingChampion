@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
-import com.sun.media.jfxmedia.events.PlayerStateEvent.PlayerState;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -19,17 +18,21 @@ import Server.Components.IdComponent;
 import Server.Components.StateComponent;
 import Server.Enities.ServerPlayer;
 import Server.Responses.WordSubmissionResponse;
+import Server.Systems.KnockoutSystem;
 import Server.Systems.MoveSystem;
 import Server.Systems.WordSystem;
+import Server.Utils.PlayerState;
 
 public class ServerGameWorld extends EntitySystem{
 
 	private Server server;
 	
 	private Engine engine;
+	private ComponentMapper<StateComponent> sm = ComponentMapper.getFor(StateComponent.class);
 	
 	private WordSystem wordSystem;
 	private MoveSystem moveSystem;
+	private KnockoutSystem koSystem;
 	private Timer update;
 	private final long TIME_STEP = 100; //Determines how often to fire the timer task in ms
 	
@@ -73,6 +76,7 @@ public class ServerGameWorld extends EntitySystem{
 		//Systems
 		wordSystem = new WordSystem(server);
 		moveSystem = new MoveSystem(server);
+		koSystem = null;
 		
 		engine.addSystem(wordSystem);
 		engine.addSystem(moveSystem);
@@ -109,15 +113,42 @@ public class ServerGameWorld extends EntitySystem{
 		}
 	}
 	
-	private void update(){
+	private void checkKnockouts() {
+		
+		StateComponent sc = null;
+		ServerPlayer whichPlayer = null;
+		
 		for(ServerPlayer p : players) {
-			
-			ComponentMapper<StateComponent> sm = ComponentMapper.getFor(StateComponent.class);
-			StateComponent sc = sm.get(p);
-			
-			if(sc.state == PlayerState.KNOCKED_OUT);
+			sc = sm.get(p);
+			if(sc.state == PlayerState.KNOCKED_OUT) {
+				whichPlayer = p;
+				break;
+			}
 		}
+		
+		if(koSystem == null && whichPlayer != null) {
+			
+			koSystem = new KnockoutSystem(server, whichPlayer);
+			
+			engine.addSystem(koSystem);
+			engine.removeSystem(moveSystem);
+			engine.removeSystem(wordSystem);
+			
+		} else if (koSystem != null && whichPlayer == null) {
+			engine.removeSystem(koSystem);
+			koSystem = null;
+			
+			engine.addSystem(moveSystem);
+			engine.addSystem(wordSystem);
+		}
+		
+	}
+	
+	private void update(){	
+		
+		checkKnockouts();		
 		engine.update(TIME_STEP);
+		
 	}
 	
 	public boolean isCompleted(){
