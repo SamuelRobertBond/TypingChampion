@@ -49,7 +49,11 @@ public class ServerPlayer extends Entity{
 	}
 
 	public void setStateTimer() {
+		
 		timer.cancel();
+		
+		timer = new Timer();
+		
 		timer.schedule(new TimerTask(){
 			@Override
 			public void run() {

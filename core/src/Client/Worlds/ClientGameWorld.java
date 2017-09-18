@@ -169,10 +169,11 @@ public class ClientGameWorld {
 	
 	private void setAnimation(AnimationResponse r){
 		
+		Gdx.app.log("ClientGameWorld setAnimation", "Setting " + r.name + "'s Animation");
+		
 		ClientPlayer player = players.get(r.name);
 		player.animationComponent.move = r.move;
 		player.animationComponent.stateTime = 0;
-		
 	}
 	
 	private void sendWord(String text) {

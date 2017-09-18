@@ -68,8 +68,8 @@ public class GameUtils {
 		TextureRegion idle[] = {frames[0][0], frames[0][1], frames[0][2], frames[0][3]};
 		TextureRegion block[] = {frames[0][4], frames[0][5], frames[0][6], frames[0][7]};
 		
-		TextureRegion jab[] = {frames[1][0], frames[1][1], frames[1][2], frames[1][3]};
-		TextureRegion cross[] = {frames[1][4], frames[1][5], frames[1][6], frames[1][7]};
+		TextureRegion jab[] = {frames[1][4], frames[1][5], frames[1][6], frames[1][7]};
+		TextureRegion cross[] = {frames[1][0], frames[1][1], frames[1][2], frames[1][3]};
 		
 		TextureRegion uppercut[] = {frames[2][0], frames[2][1], frames[2][2], frames[2][3]};
 		TextureRegion ko[] = {frames[2][4]};

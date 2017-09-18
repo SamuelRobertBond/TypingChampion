@@ -165,6 +165,7 @@ public class ServerGameWorld extends EntitySystem {
 		while(!listeners.isEmpty()){
 			server.removeListener(listeners.pop());
 		}
+		
 		wordSystem.dispose();
 		moveSystem.dispose();
 	}

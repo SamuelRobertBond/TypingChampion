@@ -130,9 +130,19 @@ public class MoveSystem extends EntitySystem{
 		
 		//Checks for blocking
 		if(r.move == MoveType.BLOCK){
+			
 			StateComponent sc = sm.get(player);
+			
+			for(Entity entity : entities){
+				if(!entity.equals(player)){
+					IdComponent ic = im.get(player);
+					sendAnimation(player, ic.id, r);
+				}
+			}
+			
 			sc.state =  PlayerState.BLOCKING;
 			player.setStateTimer();
+			
 		}else{
 			
 			//Check for moves
@@ -181,13 +191,12 @@ public class MoveSystem extends EntitySystem{
 						//Response Systems
 						
 						//Attacker update
-						sendStats(player, sc.state);
-						sendAnimation(player, r);
+						sendStats(player);
+						sendAnimation(player, ic.id, r);
 						
 						//Defender update
 						sc = sm.get(player);
-						sendStats(entity, sc.state);
-						sendAnimation(entity, r);
+						sendStats(entity);
 					}
 				}
 			}
@@ -195,12 +204,14 @@ public class MoveSystem extends EntitySystem{
 		
 	}
 	
-	private void sendAnimation(Entity player, MoveRequest r) {
+	private void sendAnimation(Entity player, int enemyID, MoveRequest r) {
+		//Send to the attacker
 		IdComponent ic = im.get(player);
 		server.sendToTCP(ic.id, new AnimationResponse(ic.name, r.move));
+		server.sendToTCP(enemyID, new AnimationResponse(ic.name, r.move));
 	}
 
-	private void sendStats(Entity player, PlayerState enemyState){
+	private void sendStats(Entity player){
 		
 		HealthComponent hc = hm.get(player);
 		EnergyComponent ec = em.get(player);
