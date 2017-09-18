@@ -148,7 +148,7 @@ public class ClientGameWorld {
 		
 		//Adds Animations to the player
 		GameUtils.createBoxerAnimation(players.get(client.name), Constants.PLAYER_SPRITE_SHEET);
-		GameUtils.createBoxerAnimation(players.get(enemyName), Constants.PLAYER_SPRITE_SHEET);
+		GameUtils.createBoxerAnimation(players.get(enemyName), Constants.ENEMY_SPRITE_SHEET);
 		
 		engine = new Engine();
 		
