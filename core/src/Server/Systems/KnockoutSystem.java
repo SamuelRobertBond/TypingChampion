@@ -1,36 +1,54 @@
 package Server.Systems;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
-import Server.Components.EnergyComponent;
-import Server.Components.HealthComponent;
+import Client.Requests.KOWordRequest;
+import Client.Requests.MoveRequest;
 import Server.Enities.ServerPlayer;
 
 public class KnockoutSystem extends EntitySystem {
 	
 	private Server server;
-	private ImmutableArray<Entity> entities;
 	private ServerPlayer player;
+	private float timeElapsed;
+	private Listener koListener;
 	
 	public KnockoutSystem(Server server, ServerPlayer player) {
-		Gdx.app.log("KO", "We have a knockout\n");
+		
+		this.timeElapsed = 0;
 		this.server = server;
+		
+		koListener = new Listener(){
+			
+			@Override
+			public void received(Connection connection, Object object) {
+				
+				if(object instanceof KOWordRequest){
+					KOWordRequest r = (KOWordRequest)object;
+				}
+				
+			}
+			
+		};
+		server.addListener(koListener);
 	}
 	
 	@Override
 	public void addedToEngine(Engine engine) {
-		entities = engine.getEntitiesFor(Family.all(EnergyComponent.class, HealthComponent.class).get());
 	}
 	
 	@Override
 	public void update(float deltaTime) {
 		
+		if(timeElapsed < 10) { 
+			timeElapsed += deltaTime * .001;
+		}
+		Gdx.app.log("Knockout System", "Countdown: " + timeElapsed);
 	}
 	
 	

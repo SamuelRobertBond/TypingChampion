@@ -15,6 +15,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
 import Client.Entities.ClientPlayer;
+import Client.Requests.KOWordRequest;
 import Client.Requests.MoveRequest;
 import Client.Requests.WordSubmissionRequest;
 import Client.Systems.SpriteRenderSystem;
@@ -24,6 +25,7 @@ import Client.Utils.GameUtils;
 import Client.Utils.MenuManager;
 import Client.Utils.MoveType;
 import Client.Utils.Role;
+import Server.Responses.KOBeginResponse;
 import Server.Responses.WordSubmissionResponse;
 
 public class ClientGameWorld {
@@ -44,10 +46,14 @@ public class ClientGameWorld {
 	
 	private String name;
 	
+	private boolean knockedOut;
+	
 	public ClientGameWorld(StretchViewport view, ClientManager client) {
 		
 		this.client = client;		
 		name = client.name;
+		
+		knockedOut = false;
 		
 		Gdx.app.log("Client World", "Client World Created");
 		
@@ -87,8 +93,26 @@ public class ClientGameWorld {
 						Gdx.app.log("Client Game World", "Receieved new word");
 						changeWord(r.newWord);
 					}
-				}
+				}			
+			}
+			
+		});		
+		client.getClient().addListener(listeners.peek());
+		
+		listeners.push(new Listener(){
+			
+			@Override
+			public void received(Connection connection, Object object) {
 				
+				if(object instanceof KOBeginResponse){
+					
+					KOBeginResponse r = (KOBeginResponse) object;
+					
+					if(r.player.compareTo(name) == 0) {
+						knockedOut = true;
+						Gdx.app.log("Client Game World", "Player " + name + " has been knocked out!");
+					}
+				}			
 			}
 			
 		});
@@ -122,8 +146,15 @@ public class ClientGameWorld {
 		
 		text = text.toUpperCase();
 		
-		if(!text.equals("") && text.equals(word.toUpperCase())){
+		if(!text.equals("") && text.equals(word.toUpperCase())){		
 			client.getClient().sendTCP(new WordSubmissionRequest(text));
+			
+			/*if(!knockedOut) {
+				client.getClient().sendTCP(new WordSubmissionRequest(text));
+			} else {
+				client.getClient().sendTCP(new KOWordRequest(text));
+			}*/
+			
 		}else{
 			checkForMove(text.toLowerCase());
 		}
@@ -131,18 +162,20 @@ public class ClientGameWorld {
 	
 	private void checkForMove(String move){
 		
-		if(move.equals("jab")){
-			client.getClient().sendTCP(new MoveRequest(client.name, MoveType.JAB));
-		}else if(move.equals("block")){
-			client.getClient().sendTCP(new MoveRequest(client.name, MoveType.BLOCK));
-		}else if(move.equals("cross")){
-			client.getClient().sendTCP(new MoveRequest(client.name, MoveType.CROSS));
-		}else if(move.equals("counter")){
-			client.getClient().sendTCP(new MoveRequest(client.name, MoveType.COUNTER));
-		}else if(move.equals("hook")){
-			client.getClient().sendTCP(new MoveRequest(client.name, MoveType.HOOK));
-		}else if(move.equals("uppercut")){
-			client.getClient().sendTCP(new MoveRequest(client.name, MoveType.UPPERCUT));
+		if(!knockedOut) {
+			if(move.equals("jab")){
+				client.getClient().sendTCP(new MoveRequest(client.name, MoveType.JAB));
+			}else if(move.equals("block")){
+				client.getClient().sendTCP(new MoveRequest(client.name, MoveType.BLOCK));
+			}else if(move.equals("cross")){
+				client.getClient().sendTCP(new MoveRequest(client.name, MoveType.CROSS));
+			}else if(move.equals("counter")){
+				client.getClient().sendTCP(new MoveRequest(client.name, MoveType.COUNTER));
+			}else if(move.equals("hook")){
+				client.getClient().sendTCP(new MoveRequest(client.name, MoveType.HOOK));
+			}else if(move.equals("uppercut")){
+				client.getClient().sendTCP(new MoveRequest(client.name, MoveType.UPPERCUT));
+			}
 		}
 		
 	}

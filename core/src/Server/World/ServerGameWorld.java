@@ -17,13 +17,14 @@ import Client.Requests.StartMatchRequest;
 import Server.Components.IdComponent;
 import Server.Components.StateComponent;
 import Server.Enities.ServerPlayer;
+import Server.Responses.KOBeginResponse;
 import Server.Responses.WordSubmissionResponse;
 import Server.Systems.KnockoutSystem;
 import Server.Systems.MoveSystem;
 import Server.Systems.WordSystem;
 import Server.Utils.PlayerState;
 
-public class ServerGameWorld extends EntitySystem{
+public class ServerGameWorld extends EntitySystem {
 
 	private Server server;
 	
@@ -129,6 +130,8 @@ public class ServerGameWorld extends EntitySystem{
 		if(koSystem == null && whichPlayer != null) {
 			
 			koSystem = new KnockoutSystem(server, whichPlayer);
+			
+			server.sendToAllTCP(new KOBeginResponse(whichPlayer.getName()));
 			
 			engine.addSystem(koSystem);
 			engine.removeSystem(moveSystem);
