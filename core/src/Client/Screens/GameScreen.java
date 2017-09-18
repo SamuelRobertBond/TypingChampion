@@ -1,14 +1,11 @@
 package Client.Screens;
 
-import java.util.HashMap;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.tdg.gdx.TypingGame;
 
-import Client.Entities.ClientPlayer;
 import Client.Requests.StartMatchRequest;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
@@ -26,8 +23,6 @@ public class GameScreen implements Screen{
 	private ServerManager server;
 	
 	private ClientGameWorld world;
-	
-	private HashMap<String, ClientPlayer> players;
 	
 
 	public GameScreen(TypingGame game, ClientManager client, ServerManager server) {

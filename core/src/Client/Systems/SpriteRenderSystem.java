@@ -48,11 +48,11 @@ public class SpriteRenderSystem extends EntitySystem{
 			
 			ac.stateTime += deltaTime;
 			
-			if(ac.stateTime > 200){
+			if(ac.stateTime > .75f){
 				ac.stateTime = 0;
 			}
 			
-			batch.draw(frame, pc.x, pc.y, pc.scale * 32, pc.scale * 32);
+			batch.draw(frame, pc.x, pc.y, pc.xScale * 32, pc.yScale * 32);
 		}
 		
 		batch.end();

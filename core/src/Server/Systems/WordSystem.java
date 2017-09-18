@@ -65,6 +65,10 @@ public class WordSystem extends EntitySystem{
 					EnergyComponent ec = em.get(entity);
 					ec.energy += ec.ENERGY_PER_LETTER * wc.word.length();
 					
+					if(ec.energy > 100){
+						ec.energy = 100;
+					}
+					
 					wc.word = WordUtil.getWord();
 					server.sendToTCP(id, new WordSubmissionResponse(true, wc.word));
 					
