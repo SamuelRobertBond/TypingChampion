@@ -4,10 +4,10 @@ import Server.Utils.PlayerState;
 
 public class StatResponse {
 
-	int health;
-	int energy;
-	PlayerState yourState;
-	PlayerState enemyState;
+	public int health;
+	public int energy;
+	public PlayerState yourState;
+	public PlayerState enemyState;
 	
 	public StatResponse(int health, int energy, PlayerState yourState, PlayerState enemyState) {
 		

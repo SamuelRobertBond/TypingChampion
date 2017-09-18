@@ -120,8 +120,8 @@ public class ClientGameWorld {
 		
 		//Players
 		players = new HashMap<Role, ClientPlayer>();
-		players.put(Role.Player, new ClientPlayer());
-		players.put(Role.Enemy, new ClientPlayer());
+		players.put(Role.Player, new ClientPlayer(client.name, 50, 50));
+		players.put(Role.Enemy, new ClientPlayer("Enemy", 200, 50));
 		
 		//Adds Animations to the player
 		GameUtils.createBoxerAnimation(players.get(Role.Player), Constants.PLAYER_SPRITE_SHEET);
@@ -134,6 +134,8 @@ public class ClientGameWorld {
 		
 		spriteSystem = new SpriteRenderSystem(name);
 		engine.addSystem(spriteSystem);
+		
+		Gdx.app.log("Client Game World", "Finished Constructing");
 	}
 
 	private void changeWord(String word){
