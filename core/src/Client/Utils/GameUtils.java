@@ -14,6 +14,7 @@ import Client.Requests.MoveRequest;
 import Client.Requests.ReadyRequest;
 import Client.Requests.StartMatchRequest;
 import Client.Requests.WordSubmissionRequest;
+import Server.Responses.AnimationResponse;
 import Server.Responses.JoinResponse;
 import Server.Responses.KOBeginResponse;
 import Server.Responses.MessageResponse;
@@ -48,6 +49,8 @@ public class GameUtils {
 		
 		kryo.register(KOBeginResponse.class);
 		kryo.register(KOWordRequest.class);
+		
+		kryo.register(AnimationResponse.class);
 		
 		kryo.register(MoveType.class);
 		kryo.register(PlayerState.class);

@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import Client.Components.AnimationComponent;
 import Client.Components.PositionComponent;
 import Client.Components.StatsComponent;
+import Client.Utils.MoveType;
 
 public class SpriteRenderSystem extends EntitySystem{
 	
@@ -42,14 +43,14 @@ public class SpriteRenderSystem extends EntitySystem{
 			
 			PositionComponent pc = pm.get(entity);
 			AnimationComponent ac = am.get(entity);
-			StatsComponent sc = sm.get(entity);
 			
-			TextureRegion frame = ac.getAnimation(sc.state).getKeyFrame(ac.stateTime);
+			TextureRegion frame = ac.getAnimation(ac.move).getKeyFrame(ac.stateTime);
 			
 			ac.stateTime += deltaTime;
 			
 			if(ac.stateTime > .75f){
 				ac.stateTime = 0;
+				ac.move = MoveType.Idle;
 			}
 			
 			batch.draw(frame, pc.x, pc.y, pc.width, pc.height);

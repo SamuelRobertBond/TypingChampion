@@ -20,6 +20,7 @@ import Server.Components.HealthComponent;
 import Server.Components.IdComponent;
 import Server.Components.StateComponent;
 import Server.Enities.ServerPlayer;
+import Server.Responses.AnimationResponse;
 import Server.Responses.KOBeginResponse;
 import Server.Responses.StatResponse;
 import Server.Utils.MoveInformation;
@@ -181,10 +182,12 @@ public class MoveSystem extends EntitySystem{
 						
 						//Attacker update
 						sendStats(player, sc.state);
+						sendAnimation(player, r);
 						
 						//Defender update
 						sc = sm.get(player);
 						sendStats(entity, sc.state);
+						sendAnimation(entity, r);
 					}
 				}
 			}
@@ -192,14 +195,18 @@ public class MoveSystem extends EntitySystem{
 		
 	}
 	
+	private void sendAnimation(Entity player, MoveRequest r) {
+		IdComponent ic = im.get(player);
+		server.sendToTCP(ic.id, new AnimationResponse(ic.name, r.move));
+	}
+
 	private void sendStats(Entity player, PlayerState enemyState){
 		
-		StateComponent sc = sm.get(player);
 		HealthComponent hc = hm.get(player);
 		EnergyComponent ec = em.get(player);
 		IdComponent ic = im.get(player);
 		
-		server.sendToTCP(ic.id, new StatResponse(hc.health, ec.energy, sc.state, enemyState));
+		server.sendToTCP(ic.id, new StatResponse(hc.health, ec.energy));
 		
 	}
 	

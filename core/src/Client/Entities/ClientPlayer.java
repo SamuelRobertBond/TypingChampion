@@ -12,7 +12,7 @@ import Server.Responses.StatResponse;
 
 public class ClientPlayer extends Entity{
 	
-	private AnimationComponent animationComponent;
+	public AnimationComponent animationComponent;
 	private PositionComponent positionComponent;
 	private StatsComponent statsComponent;
 	
@@ -32,10 +32,8 @@ public class ClientPlayer extends Entity{
 	}
 	
 	public void updateStats(StatResponse r){
-		
 		statsComponent.health = r.health;
 		statsComponent.energy = r.energy;
-		
 	}
 	
 	public void setAnimationState(MoveType type){

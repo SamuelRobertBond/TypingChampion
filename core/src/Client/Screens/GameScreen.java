@@ -25,14 +25,14 @@ public class GameScreen implements Screen{
 	private ClientGameWorld world;
 	
 
-	public GameScreen(TypingGame game, ClientManager client, ServerManager server) {
+	public GameScreen(TypingGame game, ClientManager client, ServerManager server, String enemyName) {
 		
 		this.game = game;
 		this.server = server;
 		this.client = client;
 		
 		view = new StretchViewport(Constants.V_WIDTH, Constants.V_HEIGHT);
-		world = new ClientGameWorld(view, client);
+		world = new ClientGameWorld(view, client, enemyName);
 		
 		client.getClient().sendTCP(new StartMatchRequest());
 		

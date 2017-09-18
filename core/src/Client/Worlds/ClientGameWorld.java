@@ -2,6 +2,8 @@ package Client.Worlds;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
@@ -25,14 +27,17 @@ import Client.Utils.GameUtils;
 import Client.Utils.MenuManager;
 import Client.Utils.MoveType;
 import Client.Utils.Role;
+import Server.Responses.AnimationResponse;
 import Server.Responses.KOBeginResponse;
 import Server.Responses.WordSubmissionResponse;
 
 public class ClientGameWorld {
 
 	private ClientManager client;
+	private StretchViewport view;
 	private Engine engine;
 	
+	private HashMap<String, ClientPlayer> players;
 	private LinkedList<Listener> listeners;
 	
 	private MenuManager menu;
@@ -41,21 +46,24 @@ public class ClientGameWorld {
 	private String word;
 	private Label wordLabel;
 	
-	private HashMap<Role, ClientPlayer> players;
 	private SpriteRenderSystem spriteSystem;
+	private Timer animationTimer;
 	
 	private String name;
 	
 	private boolean knockedOut;
 	
-	public ClientGameWorld(StretchViewport view, ClientManager client) {
+	public ClientGameWorld(StretchViewport view, ClientManager client, String enemyName) {
 		
-		this.client = client;		
+		this.client = client;	
+		this.view = view;
 		name = client.name;
 		
 		knockedOut = false;
 		
 		Gdx.app.log("Client World", "Client World Created");
+		
+		animationTimer = new Timer();
 		
 		menu = new MenuManager(view);
 		wordLabel = menu.addLabel("");
@@ -99,6 +107,7 @@ public class ClientGameWorld {
 		});		
 		client.getClient().addListener(listeners.peek());
 		
+		//KO Listener
 		listeners.push(new Listener(){
 			
 			@Override
@@ -118,19 +127,33 @@ public class ClientGameWorld {
 		});
 		client.getClient().addListener(listeners.peek());
 		
+		//Animation Listener
+		listeners.push(new Listener(){
+			
+			public void received(Connection connection, Object object) {
+				
+				if(object instanceof AnimationResponse){
+					setAnimation((AnimationResponse)object);
+				}
+				
+			};
+			
+		});
+		client.getClient().addListener(listeners.peek());
+		
 		//Players
-		players = new HashMap<Role, ClientPlayer>();
-		players.put(Role.Player, new ClientPlayer(client.name, 50, 50));
-		players.put(Role.Enemy, new ClientPlayer("Enemy", 200, 50));
+		players = new HashMap<String, ClientPlayer>();
+		players.put(client.name, new ClientPlayer(client.name, Constants.V_WIDTH/4, Constants.V_HEIGHT/2, 64, 64));
+		players.put(enemyName, new ClientPlayer(enemyName, Constants.V_WIDTH * 0.75f, Constants.V_HEIGHT/2, -64, 64));
 		
 		//Adds Animations to the player
-		GameUtils.createBoxerAnimation(players.get(Role.Player), Constants.PLAYER_SPRITE_SHEET);
-		GameUtils.createBoxerAnimation(players.get(Role.Enemy), Constants.PLAYER_SPRITE_SHEET);
+		GameUtils.createBoxerAnimation(players.get(client.name), Constants.PLAYER_SPRITE_SHEET);
+		GameUtils.createBoxerAnimation(players.get(enemyName), Constants.PLAYER_SPRITE_SHEET);
 		
 		engine = new Engine();
 		
-		engine.addEntity(players.get(Role.Player));
-		engine.addEntity(players.get(Role.Enemy));
+		engine.addEntity(players.get(client.name));
+		engine.addEntity(players.get(enemyName));
 		
 		spriteSystem = new SpriteRenderSystem(name);
 		engine.addSystem(spriteSystem);
@@ -142,6 +165,14 @@ public class ClientGameWorld {
 		this.word = word;
 		this.wordLabel.setText(word);
 		field.setText("");
+	}
+	
+	private void setAnimation(AnimationResponse r){
+		
+		ClientPlayer player = players.get(r.name);
+		player.animationComponent.move = r.move;
+		player.animationComponent.stateTime = 0;
+		
 	}
 	
 	private void sendWord(String text) {
@@ -185,6 +216,10 @@ public class ClientGameWorld {
 	public void render(float delta) {
 		menu.render(delta);
 		engine.update(delta);
+	}
+	
+	public void resize(int width, int height){
+		view.update(width, height);
 	}
 	
 	public void dispose(){
