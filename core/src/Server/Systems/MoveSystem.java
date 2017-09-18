@@ -20,6 +20,7 @@ import Server.Components.HealthComponent;
 import Server.Components.IdComponent;
 import Server.Components.StateComponent;
 import Server.Enities.ServerPlayer;
+import Server.Responses.KOBeginResponse;
 import Server.Responses.StatResponse;
 import Server.Utils.MoveInformation;
 import Server.Utils.PlayerState;
@@ -169,9 +170,10 @@ public class MoveSystem extends EntitySystem{
 						if(hc.health < 0){
 							hc.health = 0;
 							sc.state =  PlayerState.KNOCKED_OUT;
+							
 							//player.setStateTimer();
 							
-							//server.sendToAllTCP(new KnockoutResponse());
+							server.sendToAllTCP(new KOBeginResponse(ic.name));
 							
 						}
 						

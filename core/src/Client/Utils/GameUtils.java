@@ -8,12 +8,14 @@ import com.esotericsoftware.kryo.Kryo;
 
 import Client.Entities.ClientPlayer;
 import Client.Requests.JoinRequest;
+import Client.Requests.KOWordRequest;
 import Client.Requests.MessageRequest;
 import Client.Requests.MoveRequest;
 import Client.Requests.ReadyRequest;
 import Client.Requests.StartMatchRequest;
 import Client.Requests.WordSubmissionRequest;
 import Server.Responses.JoinResponse;
+import Server.Responses.KOBeginResponse;
 import Server.Responses.MessageResponse;
 import Server.Responses.MoveResponse;
 import Server.Responses.StartResponse;
@@ -43,6 +45,9 @@ public class GameUtils {
 		
 		kryo.register(StartMatchRequest.class);
 		kryo.register(StatResponse.class);
+		
+		kryo.register(KOBeginResponse.class);
+		kryo.register(KOWordRequest.class);
 		
 		kryo.register(MoveType.class);
 		kryo.register(PlayerState.class);
