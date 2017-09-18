@@ -205,6 +205,7 @@ public class MoveSystem extends EntitySystem{
 		
 		int damage = 0;
 		PlayerState state = stateComponent.state;
+		stateComponent.move = move;
 		
 		if(move == MoveType.JAB){
 			

@@ -52,7 +52,7 @@ public class SpriteRenderSystem extends EntitySystem{
 				ac.stateTime = 0;
 			}
 			
-			batch.draw(frame, pc.x, pc.y, pc.xScale * 32, pc.yScale * 32);
+			batch.draw(frame, pc.x, pc.y, pc.width, pc.height);
 		}
 		
 		batch.end();

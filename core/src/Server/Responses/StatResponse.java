@@ -1,21 +1,21 @@
 package Server.Responses;
 
-import Server.Utils.PlayerState;
+import Client.Utils.MoveType;
+import Client.Utils.Role;
 
 public class StatResponse {
 
+	public Role role;
 	public int health;
 	public int energy;
-	public PlayerState yourState;
-	public PlayerState enemyState;
+	public MoveType move;
 	
-	public StatResponse(int health, int energy, PlayerState yourState, PlayerState enemyState) {
+	public StatResponse(Role role, int health, int energy, MoveType move) {
 		
+		this.role = role;
 		this.health = health;
 		this.energy = energy;
-		
-		this.yourState = yourState;
-		this.enemyState = enemyState;
+		this.move = move;
 		
 	}
 	

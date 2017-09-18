@@ -24,12 +24,16 @@ import Client.Utils.GameUtils;
 import Client.Utils.MenuManager;
 import Client.Utils.MoveType;
 import Client.Utils.Role;
+import Server.Responses.MessageResponse;
+import Server.Responses.MoveResponse;
+import Server.Responses.StatResponse;
 import Server.Responses.WordSubmissionResponse;
 
 public class ClientGameWorld {
 
 	private ClientManager client;
 	private Engine engine;
+	private StretchViewport view;
 	
 	private LinkedList<Listener> listeners;
 	
@@ -46,7 +50,8 @@ public class ClientGameWorld {
 	
 	public ClientGameWorld(StretchViewport view, ClientManager client) {
 		
-		this.client = client;		
+		this.client = client;
+		this.view = view;
 		name = client.name;
 		
 		Gdx.app.log("Client World", "Client World Created");
@@ -94,14 +99,38 @@ public class ClientGameWorld {
 		});
 		client.getClient().addListener(listeners.peek());
 		
+		//Move Response Listener
+		listeners.push(new Listener(){
+			
+			@Override
+			public void received(Connection connection, Object object) {
+				if(object instanceof MoveResponse){
+					setPlayerState((MoveResponse)object);
+				}
+			}
+			
+		});
+		
+		//Stats Response Listener
+		listeners.push(new Listener(){
+			
+			@Override
+			public void received(Connection connection, Object object) {
+				if(object instanceof StatResponse){
+					updateStats((StatResponse)object);
+				}
+			}
+			
+		});
+		
 		//Players
 		players = new HashMap<Role, ClientPlayer>();
-		players.put(Role.Player, new ClientPlayer(client.name, 50, 50));
-		players.put(Role.Enemy, new ClientPlayer("Enemy", 200, 50));
+		players.put(Role.Player, new ClientPlayer(client.name, Constants.V_WIDTH * .25f, Constants.V_HEIGHT/2, 64, 64));
+		players.put(Role.Enemy, new ClientPlayer("Enemy", Constants.V_WIDTH * .75f, Constants.V_HEIGHT/2, -64, 64));
 		
 		//Adds Animations to the player
 		GameUtils.createBoxerAnimation(players.get(Role.Player), Constants.PLAYER_SPRITE_SHEET);
-		GameUtils.createBoxerAnimation(players.get(Role.Enemy), Constants.PLAYER_SPRITE_SHEET);
+		GameUtils.createBoxerAnimation(players.get(Role.Enemy), Constants.ENEMY_SPRITE_SHEET);
 		
 		engine = new Engine();
 		
@@ -131,6 +160,12 @@ public class ClientGameWorld {
 		}
 	}
 	
+	private void updateStats(StatResponse r){
+		
+		ClientPlayer player = players.get(r.role);
+		
+	}
+	
 	private void checkForMove(String move){
 		
 		if(move.equals("jab")){
@@ -152,6 +187,14 @@ public class ClientGameWorld {
 	public void render(float delta) {
 		menu.render(delta);
 		engine.update(delta);
+	}
+	
+	public void resize(int width, int height){
+		view.update(width, height);
+	}
+	
+	private void setPlayerState(MoveResponse r){
+		
 	}
 	
 	public void dispose(){

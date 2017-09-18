@@ -192,7 +192,7 @@ public class LobbyScreen implements Screen{
 		
 		if(start != null){
 			this.dispose();
-			game.setScreen(new GameScreen(game, client, server));
+			game.setScreen(new GameScreen(game, client, server, start));
 		}
 		
 	}
