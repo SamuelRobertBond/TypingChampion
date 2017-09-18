@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -24,6 +25,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.viewport.Viewport;
+
+import Client.Components.UIComponent;
 
 public class MenuManager {
 
@@ -253,6 +256,63 @@ public class MenuManager {
 	
 	public Table getMainTable(){
 		return table;
+	}
+	
+	public Label addFloatingText(String text, float x, float y){
+		Label label = new Label(text, skin);
+		label.setPosition(x, y);
+		stage.addActor(label);
+		return label;
+	}
+	
+	public TextField addFloatingTextField(float x, float y, float width, float height){
+		
+		TextField field = new TextField("", skin);
+		field.setPosition(x, y);
+		field.setSize(width, height);
+		
+		stage.addActor(field);
+		
+		return field;
+	}
+	
+	public UIComponent addStatsUI(float x, float y, float width, float height, float gap){
+		
+		Pixmap pixmap = new Pixmap((int)(width), (int)(height), Pixmap.Format.RGB888);
+		pixmap.setColor(Color.BLACK);
+		
+		Texture healthFrameTex = new Texture(pixmap);
+		Sprite healthFrameSprite = new Sprite(healthFrameTex);
+		healthFrameSprite.setPosition(x, y);
+		healthFrameSprite.setSize(width, height);
+		
+		pixmap = new Pixmap((int)(width), (int)(height), Pixmap.Format.RGB888);
+		pixmap.setColor(Color.GREEN);
+		
+		Texture healthTex = new Texture(pixmap);
+		Sprite healthSprite = new Sprite(healthTex);
+		healthSprite.setPosition(x + width*.1f, y);
+		healthSprite.setSize(width * .8f, height);
+		
+		x += gap;
+		
+		pixmap = new Pixmap((int)(width), (int)(height), Pixmap.Format.RGB888);
+		pixmap.setColor(Color.ORANGE);
+		
+		Texture energyTex = new Texture(pixmap);
+		Sprite energySprite = new Sprite(energyTex);
+		energySprite.setPosition(x + width*.1f, y);
+		energySprite.setSize(width * .8f, height);
+		
+		pixmap = new Pixmap((int)(width), (int)(height), Pixmap.Format.RGB888);
+		pixmap.setColor(Color.BLACK);
+		
+		Texture energyFrameTex = new Texture(pixmap);
+		Sprite energyFrameSprite = new Sprite(energyFrameTex);
+		energyFrameSprite.setPosition(x + width, y);
+		energyFrameSprite.setSize(width, height);
+		
+		return new UIComponent(width * .8f, healthSprite, energySprite, healthFrameSprite, energyFrameSprite);
 	}
 	
 	public Stage getStage(){

@@ -21,6 +21,7 @@ import Client.Requests.KOWordRequest;
 import Client.Requests.MoveRequest;
 import Client.Requests.WordSubmissionRequest;
 import Client.Systems.SpriteRenderSystem;
+import Client.Systems.UiRenderSystem;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
 import Client.Utils.GameUtils;
@@ -47,7 +48,7 @@ public class ClientGameWorld {
 	private Label wordLabel;
 	
 	private SpriteRenderSystem spriteSystem;
-	private Timer animationTimer;
+	private UiRenderSystem uiSystem;
 	
 	private String name;
 	
@@ -61,18 +62,11 @@ public class ClientGameWorld {
 		
 		knockedOut = false;
 		
-		Gdx.app.log("Client World", "Client World Created");
-		
-		animationTimer = new Timer();
-		
 		menu = new MenuManager(view);
-		wordLabel = menu.addLabel("");
-		
-		menu.row();
+		wordLabel = menu.addFloatingText("First", 100, 100);
 		
 		//Text Field Enter Listener
-		field = menu.addTextField();
-		menu.setActorCellSize(400, 34, field);
+		field = menu.addFloatingTextField(100, 100, 200, 100);
 		field.addListener(new InputListener(){
 			
 			@Override
@@ -146,6 +140,9 @@ public class ClientGameWorld {
 		players.put(client.name, new ClientPlayer(client.name, Constants.V_WIDTH/4, Constants.V_HEIGHT/2, 64, 64));
 		players.put(enemyName, new ClientPlayer(enemyName, Constants.V_WIDTH * 0.75f, Constants.V_HEIGHT/2, -64, 64));
 		
+		//Adding Stats UI
+		players.get(client.name).addUI(menu.addStatsUI(0, 10, 100, 50, 20));
+		
 		//Adds Animations to the player
 		GameUtils.createBoxerAnimation(players.get(client.name), Constants.PLAYER_SPRITE_SHEET);
 		GameUtils.createBoxerAnimation(players.get(enemyName), Constants.ENEMY_SPRITE_SHEET);
@@ -157,6 +154,9 @@ public class ClientGameWorld {
 		
 		spriteSystem = new SpriteRenderSystem(name);
 		engine.addSystem(spriteSystem);
+		
+		uiSystem = new UiRenderSystem(players.get(client.name));
+		engine.addSystem(uiSystem);
 		
 		Gdx.app.log("Client Game World", "Finished Constructing");
 	}

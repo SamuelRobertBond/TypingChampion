@@ -7,15 +7,17 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import Client.Components.AnimationComponent;
 import Client.Components.PositionComponent;
 import Client.Components.StatsComponent;
+import Client.Components.UIComponent;
 import Client.Utils.MoveType;
 import Server.Responses.StatResponse;
 
 public class ClientPlayer extends Entity{
 	
 	public AnimationComponent animationComponent;
+	public UIComponent uiComponent;
 	private PositionComponent positionComponent;
 	private StatsComponent statsComponent;
-	
+
 	public ClientPlayer(String name, float x, float y, float width, float height) {
 		
 		positionComponent = new PositionComponent(x, y, width, height);
@@ -38,6 +40,15 @@ public class ClientPlayer extends Entity{
 	
 	public void setAnimationState(MoveType type){
 		statsComponent.state = type;
+	}
+
+	public void addUI(UIComponent ui) {
+		this.uiComponent = ui;
+		add(ui);
+	}
+	
+	public void dispose(){
+		//Add Garbage Collection here
 	}
 	
 }
