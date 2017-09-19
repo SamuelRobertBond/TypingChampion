@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -280,39 +281,45 @@ public class MenuManager {
 		
 		Pixmap pixmap = new Pixmap((int)(width), (int)(height), Pixmap.Format.RGB888);
 		pixmap.setColor(Color.BLACK);
+		pixmap.fill();
 		
-		Texture healthFrameTex = new Texture(pixmap);
+		Texture healthFrameTex = new Texture(new PixmapTextureData(pixmap, pixmap.getFormat(), false, true));
 		Sprite healthFrameSprite = new Sprite(healthFrameTex);
 		healthFrameSprite.setPosition(x, y);
 		healthFrameSprite.setSize(width, height);
 		
+		
 		pixmap = new Pixmap((int)(width), (int)(height), Pixmap.Format.RGB888);
 		pixmap.setColor(Color.GREEN);
+		pixmap.fill();
 		
-		Texture healthTex = new Texture(pixmap);
+		Texture healthTex = new Texture(new PixmapTextureData(pixmap, pixmap.getFormat(), false, true));
 		Sprite healthSprite = new Sprite(healthTex);
-		healthSprite.setPosition(x + width*.1f, y);
-		healthSprite.setSize(width * .8f, height);
+		healthSprite.setPosition(x + height * 0.1f, y + height * .1f);
+		healthSprite.setSize(width - (height * .2f), height * .8f);
 		
-		x += gap;
+		x += gap + width;
 		
 		pixmap = new Pixmap((int)(width), (int)(height), Pixmap.Format.RGB888);
 		pixmap.setColor(Color.ORANGE);
+		pixmap.fill();
 		
-		Texture energyTex = new Texture(pixmap);
+		Texture energyTex = new Texture(new PixmapTextureData(pixmap, pixmap.getFormat(), false, true));
 		Sprite energySprite = new Sprite(energyTex);
-		energySprite.setPosition(x + width*.1f, y);
-		energySprite.setSize(width * .8f, height);
+		energySprite.setPosition(x + height* .1f, y + height * .1f);
+		energySprite.setSize(width - (height * .2f), height * .8f);
 		
 		pixmap = new Pixmap((int)(width), (int)(height), Pixmap.Format.RGB888);
 		pixmap.setColor(Color.BLACK);
+		pixmap.fill();
 		
-		Texture energyFrameTex = new Texture(pixmap);
+		Texture energyFrameTex = new Texture(new PixmapTextureData(pixmap, pixmap.getFormat(), false, true));
 		Sprite energyFrameSprite = new Sprite(energyFrameTex);
-		energyFrameSprite.setPosition(x + width, y);
+		energyFrameSprite.setPosition(x, y);
 		energyFrameSprite.setSize(width, height);
 		
-		return new UIComponent(width * .8f, healthSprite, energySprite, healthFrameSprite, energyFrameSprite);
+		
+		return new UIComponent(healthSprite, energySprite, healthFrameSprite, energyFrameSprite);
 	}
 	
 	public Stage getStage(){
@@ -367,6 +374,10 @@ public class MenuManager {
 
 	public void resize(int width, int height) {
 		stage.getViewport().update(width, height);
+	}
+
+	public void removeActor(Actor actor) {
+		actor.remove();
 	}
 	
 }

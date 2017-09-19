@@ -1,6 +1,7 @@
 package Client.Entities;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -34,8 +35,12 @@ public class ClientPlayer extends Entity{
 	}
 	
 	public void updateStats(StatResponse r){
+		
 		statsComponent.health = r.health;
 		statsComponent.energy = r.energy;
+		
+		Gdx.app.log("Client Player", "( " +statsComponent.health + ", " + statsComponent.energy + ")"); 
+		
 	}
 	
 	public void setAnimationState(MoveType type){

@@ -171,6 +171,9 @@ public class MoveSystem extends EntitySystem{
 							ec.energy = 0;
 						}
 						
+						sendStats(player);
+						sendStats(entity);
+						
 					}else{
 						
 						//Health Deduction
@@ -216,6 +219,8 @@ public class MoveSystem extends EntitySystem{
 		HealthComponent hc = hm.get(player);
 		EnergyComponent ec = em.get(player);
 		IdComponent ic = im.get(player);
+		
+		Gdx.app.log("MoveSystem", "Sending Stats");
 		
 		server.sendToTCP(ic.id, new StatResponse(hc.health, ec.energy));
 		

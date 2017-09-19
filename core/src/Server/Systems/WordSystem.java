@@ -13,8 +13,10 @@ import com.esotericsoftware.kryonet.Server;
 
 import Client.Requests.WordSubmissionRequest;
 import Server.Components.EnergyComponent;
+import Server.Components.HealthComponent;
 import Server.Components.IdComponent;
 import Server.Components.WordComponent;
+import Server.Responses.StatResponse;
 import Server.Responses.WordSubmissionResponse;
 import Server.Utils.WordUtil;
 
@@ -22,6 +24,7 @@ public class WordSystem extends EntitySystem{
 	
 	private Server server;
 	
+	private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 	private ComponentMapper<IdComponent> im = ComponentMapper.getFor(IdComponent.class);
 	private ComponentMapper<WordComponent> wm = ComponentMapper.getFor(WordComponent.class);
 	private ComponentMapper<EnergyComponent> em = ComponentMapper.getFor(EnergyComponent.class);
@@ -71,6 +74,7 @@ public class WordSystem extends EntitySystem{
 					
 					wc.word = WordUtil.getWord();
 					server.sendToTCP(id, new WordSubmissionResponse(true, wc.word));
+					sendStats(entity);
 					
 				}else{
 					server.sendToTCP(id, new WordSubmissionResponse(false, null));
@@ -91,5 +95,16 @@ public class WordSystem extends EntitySystem{
 		server.removeListener(wordListener);
 	}
 	
+	private void sendStats(Entity player){
+		
+		HealthComponent hc = hm.get(player);
+		EnergyComponent ec = em.get(player);
+		IdComponent ic = im.get(player);
+		
+		Gdx.app.log("MoveSystem", "Sending Stats");
+		
+		server.sendToTCP(ic.id, new StatResponse(hc.health, ec.energy));
+		
+	}
 	
 }

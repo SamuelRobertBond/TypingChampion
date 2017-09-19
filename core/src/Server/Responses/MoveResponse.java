@@ -4,7 +4,14 @@ import Client.Utils.MoveType;
 
 public class MoveResponse {
 
-	public String name;
 	public MoveType move;
+	
+	public MoveResponse(MoveType move) {
+		this.move = move;
+	}
+	
+	public MoveResponse(){
+		
+	}
 	
 }

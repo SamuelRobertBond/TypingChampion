@@ -13,8 +13,9 @@ public class UIComponent implements Component{
 	public Sprite energySprite;
 	public Sprite energyFrameSprite;
 	
-	public UIComponent(float FULL_BAR_WIDTH, Sprite healthSprite, Sprite energySprite, Sprite healthFrameSprite, Sprite energyFrameSprite) {
-		this.MAX_BAR_WIDTH = FULL_BAR_WIDTH;
+	public UIComponent(Sprite healthSprite, Sprite energySprite, Sprite healthFrameSprite, Sprite energyFrameSprite) {
+
+		MAX_BAR_WIDTH = healthSprite.getWidth();
 		this.healthSprite = healthSprite;
 		this.healthFrameSprite = healthFrameSprite;
 		this.energySprite = energySprite;

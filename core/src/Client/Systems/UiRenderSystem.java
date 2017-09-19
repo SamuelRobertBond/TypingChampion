@@ -27,8 +27,8 @@ public class UiRenderSystem extends EntitySystem{
 	@Override
 	public void update(float deltaTime) {
 		
-		uc.healthSprite.setSize(uc.MAX_BAR_WIDTH * sc.health/sc.MAX_HEALTH, uc.healthSprite.getHeight());
-		uc.energySprite.setSize(uc.MAX_BAR_WIDTH * sc.energy/sc.MAX_ENERGY, uc.energySprite.getHeight());
+		uc.healthSprite.setSize(uc.MAX_BAR_WIDTH * (sc.health/sc.MAX_HEALTH), uc.healthSprite.getHeight());
+		uc.energySprite.setSize(uc.MAX_BAR_WIDTH * (sc.energy/sc.MAX_ENERGY), uc.energySprite.getHeight());
 		
 		batch.begin();
 		
