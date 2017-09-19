@@ -4,6 +4,10 @@
 
 Typing Champ is a typing fighting game made for the 2017 A Game by its cover game jam. The game jam required us to make a game inspired by artwork given in the are exhibition linked below. We used the Libgdx Game Development Framework and Kryonet.
 
+What We Came Up With:
+
+A typer-fighter boxing game. 
+
 How To Play:
 
 After connecting to a lobby click ready in order to queue yourself for a match. 
