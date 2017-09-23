@@ -46,7 +46,7 @@ public class KnockoutSystem extends EntitySystem {
 	public void update(float deltaTime) {
 		
 		if(timeElapsed < 10) { 
-			timeElapsed += deltaTime * .001;
+			timeElapsed += deltaTime;
 		}
 		Gdx.app.log("Knockout System", "Countdown: " + timeElapsed);
 	}

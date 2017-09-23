@@ -10,7 +10,10 @@ import com.badlogic.gdx.math.MathUtils;
 
 public class WordUtil {
 	
-	private static HashMap<Integer, String> words;
+	private static final int WORD_MIN_LENGTH = 3;
+	private static final int WORD_MAX_LENGTH = 7;
+	
+	private static HashMap<Integer, LinkedList<String>> words;
 	
 	public static void initializeWords(){
 		
@@ -20,12 +23,20 @@ public class WordUtil {
 		
 		in = new Scanner(handle.read());
 		
-		words = new HashMap<Integer, String>();
+		words = new HashMap<Integer, LinkedList<String>>();
+		
+		setUpMap();
 		
 		if(in != null){
 			
-			for(int i = 0; in.hasNext(); ++i){
-				words.put(i, in.nextLine());
+			while(in.hasNext()){
+				
+				String word = in.nextLine();
+				
+				if(words.containsKey(word.length())){
+					words.get(word.length()).add(word);
+				}
+				
 			}
 			
 			in.close();
@@ -33,10 +44,33 @@ public class WordUtil {
 		
 	}
 	
-	public static String getWord(){
+	private static void setUpMap() {
 		
-		System.out.println("words size " + words.size());
+		for(int i = WORD_MIN_LENGTH; i <= WORD_MAX_LENGTH; ++i){
+			words.put(i, new LinkedList<String>());
+		}
 		
-		return words.get(MathUtils.random(words.size() - 1));
 	}
+
+	public static String getWord(){
+		LinkedList<String> l = words.get(MathUtils.random(WORD_MIN_LENGTH, WORD_MAX_LENGTH));
+		return l.get(MathUtils.random(l.size() - 1));
+	}
+	
+	/**
+	 * Returns a word of the specified length, if there are no words of that length it returns null
+	 * @param length
+	 * @return
+	 */
+	public static String getWord(int length){
+		
+		if(words.containsKey(length)){
+			LinkedList<String> l = words.get(length);
+			return l.get(MathUtils.random(l.size() - 1));
+		}else{
+			return null;
+		}
+		
+	}
+	
 }
