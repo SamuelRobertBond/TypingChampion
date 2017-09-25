@@ -21,7 +21,7 @@ import Server.Components.IdComponent;
 import Server.Components.StateComponent;
 import Server.Enities.ServerPlayer;
 import Server.Responses.AnimationResponse;
-import Server.Responses.KOBeginResponse;
+import Server.Responses.KOResponse;
 import Server.Responses.StatResponse;
 import Server.Utils.MoveInformation;
 import Server.Utils.PlayerState;
@@ -159,7 +159,7 @@ public class MoveSystem extends EntitySystem{
 					StateComponent sc = sm.get(entity);
 					
 					//Gets the adjusted damage
-					int damage = getDamage(sc, r.move);
+					int damage = getDamage((ServerPlayer)entity, r.move);
 					
 					//Jab Energy Mitigation
 					if(r.move == MoveType.JAB && ec.energy > ec.MAX_ENERGY * .5f){
@@ -185,9 +185,10 @@ public class MoveSystem extends EntitySystem{
 							hc.health = 0;
 							sc.state =  PlayerState.KNOCKED_OUT;
 							
-							//player.setStateTimer();
-							
-							server.sendToAllTCP(new KOBeginResponse(ic.name));
+							for(int j = 0; j < entities.size(); ++j){
+								IdComponent id = im.get(entity);
+								server.sendToTCP(id.id, new KOResponse(ic.name, true));
+							}
 							
 						}
 						
@@ -226,7 +227,9 @@ public class MoveSystem extends EntitySystem{
 		
 	}
 	
-	private int getDamage(StateComponent stateComponent, MoveType move){
+	private int getDamage(ServerPlayer player, MoveType move){
+		
+		StateComponent stateComponent = sm.get(player);
 		
 		int damage = 0;
 		PlayerState state = stateComponent.state;
@@ -250,7 +253,7 @@ public class MoveSystem extends EntitySystem{
 			
 			damage = MoveInformation.UPPERCUT_DAMAGE;
 			stateComponent.state = PlayerState.WEAKEND;
-			
+			player.setStateTimer();
 			
 		}else if(move == MoveType.HOOK){
 			

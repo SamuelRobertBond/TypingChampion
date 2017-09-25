@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
@@ -14,21 +15,27 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import Client.Requests.StartMatchRequest;
+import Server.Components.EnergyComponent;
+import Server.Components.HealthComponent;
 import Server.Components.IdComponent;
 import Server.Components.StateComponent;
 import Server.Enities.ServerPlayer;
-import Server.Responses.KOBeginResponse;
+import Server.Responses.KOResponse;
+import Server.Responses.StatResponse;
 import Server.Responses.WordSubmissionResponse;
 import Server.Systems.KnockoutSystem;
 import Server.Systems.MoveSystem;
 import Server.Systems.WordSystem;
 import Server.Utils.PlayerState;
 
-public class ServerGameWorld extends EntitySystem {
+public class ServerGameWorld{
 
 	private Server server;
 	
 	private Engine engine;
+	private ComponentMapper<IdComponent> im = ComponentMapper.getFor(IdComponent.class);
+	private ComponentMapper<EnergyComponent> em = ComponentMapper.getFor(EnergyComponent.class);
+	private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 	private ComponentMapper<StateComponent> sm = ComponentMapper.getFor(StateComponent.class);
 	
 	private WordSystem wordSystem;
@@ -77,7 +84,7 @@ public class ServerGameWorld extends EntitySystem {
 		//Systems
 		wordSystem = new WordSystem(server);
 		moveSystem = new MoveSystem(server);
-		koSystem = null;
+
 		
 		engine.addSystem(wordSystem);
 		engine.addSystem(moveSystem);
@@ -88,11 +95,13 @@ public class ServerGameWorld extends EntitySystem {
 			
 			@Override
 			public void run() {
-				//Gdx.app.log("Server Game World", "Updating Server");
-				update();
+				update(TIME_STEP/1000);
+				checkKnockouts();
 			}
 			
 		}, TIME_STEP, TIME_STEP);
+		
+		
 		
 	}
 	
@@ -116,47 +125,94 @@ public class ServerGameWorld extends EntitySystem {
 	
 	private void checkKnockouts() {
 		
-		StateComponent sc = null;
-		ServerPlayer whichPlayer = null;
-		
-		for(ServerPlayer p : players) {
-			sc = sm.get(p);
-			if(sc.state == PlayerState.KNOCKED_OUT) {
-				whichPlayer = p;
-				break;
+		if(koSystem == null){
+			
+			for(ServerPlayer p : players) {
+				
+				StateComponent sc = sm.get(p);
+				
+				if(sc.state == PlayerState.KNOCKED_OUT) {
+					
+					Gdx.app.log("Server Game World", p.getName() + " Knocked out");
+					
+					koSystem = new KnockoutSystem(server, p);
+					engine.addSystem(koSystem);
+					
+					engine.removeSystem(moveSystem);
+					engine.removeSystem(wordSystem);
+					
+					moveSystem.dispose();
+					wordSystem.dispose();
+					
+					break;
+				}
+				
 			}
-		}
-		
-		if(koSystem == null && whichPlayer != null) {
 			
-			koSystem = new KnockoutSystem(server, whichPlayer);
 			
-			server.sendToAllTCP(new KOBeginResponse(whichPlayer.getName()));
 			
-			engine.addSystem(koSystem);
-			engine.removeSystem(moveSystem);
-			engine.removeSystem(wordSystem);
+		}else if(koSystem.knockedOut()){
 			
-		} else if (koSystem != null && whichPlayer == null) {
+			//End Game
+			
+		}else if(koSystem.hasCompleted()){
+			
+			wordSystem = new WordSystem(server);
+			moveSystem = new MoveSystem(server);
+			
+			HealthComponent hc = hm.get(koSystem.getPlayer());
+			StateComponent sc = sm.get(koSystem.getPlayer());
+			
+			hc.health = hc.maxHealth;
+			++hc.knockouts;
+			
+			sc.state = PlayerState.OPEN;
+			
 			engine.removeSystem(koSystem);
 			koSystem = null;
 			
-			engine.addSystem(moveSystem);
 			engine.addSystem(wordSystem);
+			engine.addSystem(moveSystem);
+			
+			
+			//End KO
+			server.sendToTCP(players[0].getID(), new KOResponse(players[0].getName(), false));
+			server.sendToTCP(players[1].getID(), new KOResponse(players[1].getName(), false));
+			
+			//Update Stats
+			server.sendToTCP(players[0].getID(), new KOResponse(players[0].getName(), false));
+			server.sendToTCP(players[1].getID(), new KOResponse(players[1].getName(), false));
+			
+			sendStats(players[0]);
+			sendStats(players[1]);
 		}
 		
 	}
 	
-	private void update(){	
+	private void update(float delta){	
 		
-		checkKnockouts();		
-		engine.update(TIME_STEP);
+		engine.update(delta);
+		checkKnockouts();
 		
 	}
 	
 	public boolean isCompleted(){
 		return completed;
 	}
+	
+	
+	private void sendStats(Entity player){
+		
+		HealthComponent hc = hm.get(player);
+		EnergyComponent ec = em.get(player);
+		IdComponent ic = im.get(player);
+		
+		Gdx.app.log("MoveSystem", "Sending Stats");
+		
+		server.sendToTCP(ic.id, new StatResponse(hc.health, ec.energy));
+		
+	}
+	
 	
 	public void dispose(){
 		

@@ -24,7 +24,7 @@ import Client.Utils.GameUtils;
 import Client.Utils.MenuManager;
 import Client.Utils.MoveType;
 import Server.Responses.AnimationResponse;
-import Server.Responses.KOBeginResponse;
+import Server.Responses.KOResponse;
 import Server.Responses.StatResponse;
 import Server.Responses.WordSubmissionResponse;
 
@@ -109,14 +109,9 @@ public class ClientGameWorld {
 			@Override
 			public void received(Connection connection, Object object) {
 				
-				if(object instanceof KOBeginResponse){
-					
-					KOBeginResponse r = (KOBeginResponse) object;
-					
-					if(r.player.compareTo(name) == 0) {
-						knockedOut = true;
-						Gdx.app.log("Client Game World", "Player " + name + " has been knocked out!");
-					}
+				if(object instanceof KOResponse){
+					KOResponse r = (KOResponse) object;
+					beginKO(r);
 				}			
 			}
 			
@@ -175,6 +170,17 @@ public class ClientGameWorld {
 		Gdx.app.log("Client Game World", "Finished Constructing");
 	}
 
+
+	private void beginKO(KOResponse r) {
+		
+		knockedOut = r.enable;
+		
+		if(r.enable){
+			setAnimation(new AnimationResponse(r.name, MoveType.Dead));
+		}
+		
+	}
+	
 	private void changeWord(String word){
 		
 		menu.removeActor(wordLabel);
@@ -201,15 +207,8 @@ public class ClientGameWorld {
 		if(!text.equals("") && text.equals(word.toUpperCase())){		
 			client.getClient().sendTCP(new WordSubmissionRequest(text));
 			
-			/*if(!knockedOut) {
-				client.getClient().sendTCP(new WordSubmissionRequest(text));
-			} else {
-				client.getClient().sendTCP(new KOWordRequest(text));
-			}*/
-			
 		}else{
 			checkForMove(text.toLowerCase());
-			
 		}
 	}
 	
