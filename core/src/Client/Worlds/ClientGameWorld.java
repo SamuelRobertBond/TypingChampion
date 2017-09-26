@@ -5,10 +5,14 @@ import java.util.LinkedList;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -24,7 +28,9 @@ import Client.Utils.GameUtils;
 import Client.Utils.MenuManager;
 import Client.Utils.MoveType;
 import Server.Responses.AnimationResponse;
+import Server.Responses.GameOverResponse;
 import Server.Responses.KOResponse;
+import Server.Responses.KOUpdateResponse;
 import Server.Responses.StatResponse;
 import Server.Responses.WordSubmissionResponse;
 
@@ -42,9 +48,12 @@ public class ClientGameWorld {
 	
 	private String word;
 	private Label wordLabel;
+	private Label koTimeLabel;
 	
 	private SpriteRenderSystem spriteSystem;
 	private UiRenderSystem uiSystem;
+	
+	private boolean completed;
 	
 	private String name;
 	
@@ -59,6 +68,7 @@ public class ClientGameWorld {
 		this.client = client;	
 		this.view = view;
 		name = client.name;
+		completed = false;
 		
 		knockedOut = false;
 		
@@ -118,6 +128,20 @@ public class ClientGameWorld {
 		});
 		client.getClient().addListener(listeners.peek());
 		
+		//KO Update Listener
+		listeners.push(new Listener(){
+			@Override
+			public void received(Connection connection, Object object) {
+				
+				if(object instanceof KOUpdateResponse){
+					updateKOTime((KOUpdateResponse)object);
+				}
+				
+			}
+
+		});
+		client.getClient().addListener(listeners.peek());
+		
 		//Animation Listener
 		listeners.push(new Listener(){
 			
@@ -141,6 +165,19 @@ public class ClientGameWorld {
 				}
 			}
 
+		});
+		client.getClient().addListener(listeners.peek());
+		
+		//Game Over Listener
+		listeners.push(new Listener(){
+			
+			@Override
+			public void received(Connection connection, Object object) {
+				if(object instanceof GameOverResponse){
+					gameover((GameOverResponse)object);
+				}
+			}
+			
 		});
 		client.getClient().addListener(listeners.peek());
 		
@@ -176,9 +213,20 @@ public class ClientGameWorld {
 		knockedOut = r.enable;
 		
 		if(r.enable){
-			setAnimation(new AnimationResponse(r.name, MoveType.Dead));
+			players.get(r.name).setDead(true);
+			koTimeLabel = menu.addFloatingText("0", Constants.V_WIDTH/2, Constants.V_HEIGHT/2);
+		}else{
+			players.get(r.name).setDead(false);
+			menu.removeActor(koTimeLabel);
+			koTimeLabel = null;
 		}
 		
+	}
+	
+	private void updateKOTime(KOUpdateResponse r) {
+		if(koTimeLabel != null){
+			koTimeLabel.setText(r.time + "");
+		}
 	}
 	
 	private void changeWord(String word){
@@ -243,12 +291,46 @@ public class ClientGameWorld {
 	}
 	
 	public void render(float delta) {
-		menu.render(delta);
 		engine.update(delta);
+		menu.render(delta);
 	}
 	
 	public void resize(int width, int height){
 		view.update(width, height);
+	}
+	
+	private void gameover(GameOverResponse r) {
+		
+		Gdx.app.log("Client Game World", "Recieved Game Over Response");
+		
+		menu.removeActor(field);
+		menu.removeActor(wordLabel);
+		menu.removeActor(koTimeLabel);
+		
+		Label label = menu.addFloatingText(r.name + " Wins!", 0, 0);
+		label.setPosition(Constants.V_WIDTH/2 - label.getWidth()/2, Constants.V_HEIGHT/2 - label.getHeight()/2);
+		
+		TextButton button = menu.addFloatingButton("To Menu", 0 , 0);
+		button.setSize(Constants.V_WIDTH/4, 20);
+		button.setPosition(Constants.V_WIDTH/2 - button.getWidth()/2, label.getY() - button.getHeight()/2 - 10);
+		
+		button.addListener(new ChangeListener() {
+			
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				setCompleted();
+			}
+
+		});
+		
+	}
+	
+	public boolean getCompleted(){
+		return completed;
+	}
+	
+	private void setCompleted(){
+		completed = true;
 	}
 	
 	public void dispose(){

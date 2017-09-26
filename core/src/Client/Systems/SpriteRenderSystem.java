@@ -19,11 +19,9 @@ public class SpriteRenderSystem extends EntitySystem{
 	
 	private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
 	private ComponentMapper<AnimationComponent> am = ComponentMapper.getFor(AnimationComponent.class);
-	private ComponentMapper<StatsComponent> sm = ComponentMapper.getFor(StatsComponent.class);
 	private ImmutableArray<Entity> entities;
 	
 	private SpriteBatch batch;
-	private String name;
 	
 	public SpriteRenderSystem(String name) {
 		batch = new SpriteBatch();
@@ -48,7 +46,7 @@ public class SpriteRenderSystem extends EntitySystem{
 			
 			ac.stateTime += deltaTime;
 			
-			if(ac.stateTime > .75f){
+			if(ac.stateTime > .75f && ac.move != MoveType.Dead){
 				ac.stateTime = 0;
 				ac.move = MoveType.Idle;
 			}

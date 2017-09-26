@@ -184,12 +184,6 @@ public class MoveSystem extends EntitySystem{
 						if(hc.health < 0){
 							hc.health = 0;
 							sc.state =  PlayerState.KNOCKED_OUT;
-							
-							for(int j = 0; j < entities.size(); ++j){
-								IdComponent id = im.get(entity);
-								server.sendToTCP(id.id, new KOResponse(ic.name, true));
-							}
-							
 						}
 						
 						//Response Systems
@@ -266,7 +260,7 @@ public class MoveSystem extends EntitySystem{
 			
 			if(stateComponent.state != PlayerState.BLOCKING && stateComponent.state != PlayerState.OPEN){
 				damage = MoveInformation.COUNTER_DAMAGE;
-				stateComponent.state = PlayerState.BLOCKING;
+				
 			}
 			
 		}

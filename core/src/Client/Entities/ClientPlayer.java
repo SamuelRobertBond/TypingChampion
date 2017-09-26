@@ -46,6 +46,10 @@ public class ClientPlayer extends Entity{
 	public void setAnimationState(MoveType type){
 		statsComponent.state = type;
 	}
+	
+	public StatsComponent getStatComponent(){
+		return statsComponent;
+	}
 
 	public void addUI(UIComponent ui) {
 		this.uiComponent = ui;
@@ -54,6 +58,15 @@ public class ClientPlayer extends Entity{
 	
 	public void dispose(){
 		//Add Garbage Collection here
+	}
+
+	public void setDead(boolean isDead) {
+		if(isDead){
+			animationComponent.move = MoveType.Dead;
+		}else{
+			animationComponent.move = MoveType.Idle;
+		}
+		
 	}
 	
 }

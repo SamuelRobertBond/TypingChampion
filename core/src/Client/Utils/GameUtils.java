@@ -15,8 +15,10 @@ import Client.Requests.ReadyRequest;
 import Client.Requests.StartMatchRequest;
 import Client.Requests.WordSubmissionRequest;
 import Server.Responses.AnimationResponse;
+import Server.Responses.GameOverResponse;
 import Server.Responses.JoinResponse;
 import Server.Responses.KOResponse;
+import Server.Responses.KOUpdateResponse;
 import Server.Responses.MessageResponse;
 import Server.Responses.MoveResponse;
 import Server.Responses.StartResponse;
@@ -48,9 +50,12 @@ public class GameUtils {
 		kryo.register(StatResponse.class);
 		
 		kryo.register(KOResponse.class);
+		kryo.register(KOUpdateResponse.class);
 		kryo.register(KOWordRequest.class);
 		
 		kryo.register(AnimationResponse.class);
+		
+		kryo.register(GameOverResponse.class);
 		
 		kryo.register(MoveType.class);
 		kryo.register(PlayerState.class);

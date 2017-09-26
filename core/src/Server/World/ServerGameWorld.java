@@ -20,6 +20,7 @@ import Server.Components.HealthComponent;
 import Server.Components.IdComponent;
 import Server.Components.StateComponent;
 import Server.Enities.ServerPlayer;
+import Server.Responses.GameOverResponse;
 import Server.Responses.KOResponse;
 import Server.Responses.StatResponse;
 import Server.Responses.WordSubmissionResponse;
@@ -46,6 +47,7 @@ public class ServerGameWorld{
 	
 	private ServerPlayer[] players;
 	private boolean completed;
+	private String winnerName;
 	
 	private int startRequests = 0;
 	
@@ -95,7 +97,7 @@ public class ServerGameWorld{
 			
 			@Override
 			public void run() {
-				update(TIME_STEP/1000);
+				update((float)TIME_STEP/1000f);
 				checkKnockouts();
 			}
 			
@@ -145,6 +147,8 @@ public class ServerGameWorld{
 					wordSystem.dispose();
 					
 					break;
+				}else{
+					winnerName = p.getName();
 				}
 				
 			}
@@ -153,8 +157,15 @@ public class ServerGameWorld{
 			
 		}else if(koSystem.knockedOut()){
 			
-			//End Game
+			Gdx.app.log("Server Game World", "Knocked Out, Sending GameOver Request");
 			
+			for(ServerPlayer player : players){
+				server.sendToTCP(player.getID(), new GameOverResponse(winnerName));
+			}
+			
+			dispose();
+			completed = true;
+		
 		}else if(koSystem.hasCompleted()){
 			
 			wordSystem = new WordSystem(server);
@@ -222,8 +233,7 @@ public class ServerGameWorld{
 			server.removeListener(listeners.pop());
 		}
 		
-		wordSystem.dispose();
-		moveSystem.dispose();
+		koSystem.dispose();
 	}
 
 }

@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -13,22 +14,26 @@ import Client.Requests.KOWordRequest;
 import Client.Requests.MoveRequest;
 import Client.Requests.WordSubmissionRequest;
 import Server.Components.HealthComponent;
+import Server.Components.IdComponent;
 import Server.Components.StateComponent;
 import Server.Enities.ServerPlayer;
+import Server.Responses.KOResponse;
+import Server.Responses.KOUpdateResponse;
 import Server.Responses.WordSubmissionResponse;
 import Server.Utils.PlayerState;
 import Server.Utils.WordUtil;
 
 public class KnockoutSystem extends EntitySystem {
 	
-	private ComponentMapper<StateComponent> sm = ComponentMapper.getFor(StateComponent.class);
+	private ComponentMapper<IdComponent> im = ComponentMapper.getFor(IdComponent.class);
 	private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
+	
+	private ImmutableArray<Entity> players;
 	
 	private Server server;
 	private ServerPlayer player;
 	
 	private HealthComponent hc;
-	private StateComponent sc;
 	
 	private float timeElapsed;
 	private Listener koListener;
@@ -43,7 +48,6 @@ public class KnockoutSystem extends EntitySystem {
 		this.player = player;
 		this.server = server;
 		
-		sc = sm.get(player);
 		hc = hm.get(player);
 		
 		timeElapsed = 0;
@@ -71,11 +75,34 @@ public class KnockoutSystem extends EntitySystem {
 	}
 	
 	@Override
+	public void addedToEngine(Engine engine) {
+		players = engine.getEntities();
+		
+		for(Entity entity : players){
+			IdComponent ic = im.get(entity);
+			server.sendToTCP(ic.id, new KOResponse(player.getName(), true));
+		}
+	}
+	
+	@Override
 	public void update(float deltaTime) {
 		
-		if(timeElapsed < 10) { 
-			timeElapsed += deltaTime * .001;
+		if(timeElapsed < 10) {
+			
+			timeElapsed += deltaTime;
+			int koTime = (int)Math.ceil(timeElapsed);
+			
+			if(koTime > 10){
+				koTime = 10;
+			}
+			
+			for(Entity p : players){
+				IdComponent ic = im.get(p);
+				server.sendToTCP(ic.id, new KOUpdateResponse(koTime));
+			}
+			
 		}else{
+			timeElapsed = 10;
 			knockedOut = true;
 		}
 		

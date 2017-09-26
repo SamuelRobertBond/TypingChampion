@@ -347,6 +347,11 @@ public class MenuManager {
 		pixmap.fill();
 		skin.add("background", new Texture(pixmap));
 		
+		pixmap = new Pixmap(2, 100, Pixmap.Format.RGB888);
+		pixmap.setColor(Color.WHITE);
+		pixmap.fill();
+		skin.add("cursor", new Texture(pixmap));
+		
 		TextButton.TextButtonStyle textStyle = new TextButton.TextButtonStyle();
 		textStyle.up = skin.newDrawable("background", Color.GRAY);
 		textStyle.down = skin.newDrawable("background", Color.DARK_GRAY);
@@ -360,6 +365,7 @@ public class MenuManager {
 		TextField.TextFieldStyle fieldStyle = new TextFieldStyle();
 		fieldStyle.font = font;
 		fieldStyle.fontColor = Color.BLACK;
+		fieldStyle.cursor = skin.newDrawable("cursor", Color.BLACK);
 		fieldStyle.background = skin.newDrawable("background", Color.LIGHT_GRAY);
 		skin.add("default", fieldStyle);
 		
@@ -378,6 +384,15 @@ public class MenuManager {
 
 	public void removeActor(Actor actor) {
 		actor.remove();
+	}
+
+	public TextButton addFloatingButton(String text, int x, int y) {
+		
+		TextButton button = new TextButton(text, skin);
+		buttons.add(button);
+		stage.addActor(button);
+		
+		return button;
 	}
 	
 }
