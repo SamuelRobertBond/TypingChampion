@@ -2,6 +2,7 @@ package Client.Utils;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Client;
@@ -32,6 +33,9 @@ public class ClientManager {
 		} catch (IOException e) {
 			Gdx.app.log("ClientManager", "Failed to connect to a client");
 			return false;
+		} catch(IllegalArgumentException e){
+			Gdx.app.log("ClientManager", "Failed to connect to a client");
+			return false;
 		}
 		
 		this.name = name;
@@ -46,9 +50,12 @@ public class ClientManager {
 			client.connect(5000, address, tcp, udp);
 		} catch (IOException e) {
 			Gdx.app.log("ClientManager", "Failed to connect to a client");
-			e.printStackTrace();
+			return false;
+		}catch(IllegalArgumentException e){
+			Gdx.app.log("ClientManager", "Failed to connect to a client");
 			return false;
 		}
+		
 		
 		this.name = name;
 		return true;

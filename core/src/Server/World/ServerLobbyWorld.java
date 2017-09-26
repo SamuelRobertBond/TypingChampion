@@ -3,6 +3,8 @@ package Server.World;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Stack;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
@@ -21,16 +23,16 @@ public class ServerLobbyWorld {
 	private HashMap<Integer, ServerPlayer> players;
 	
 	private LinkedList<ServerGameWorld> games;
+	private Timer timer;
 	
 	private Stack<Listener> listeners;
 	
 	public ServerLobbyWorld(Server server) {
 		
 		this.server = server;
+		
 		players = new HashMap<Integer, ServerPlayer>();
-		
 		games = new LinkedList<ServerGameWorld>();
-		
 		listeners = new Stack<Listener>();
 		
 		//Message Listener
@@ -62,14 +64,37 @@ public class ServerLobbyWorld {
 		});
 		server.addListener(listeners.peek());
 		
-		
-		listeners.push(new Listener(){
+		timer = new Timer();
+		timer.schedule(new TimerTask(){
 			
-			public void disconnected(Connection connection) {
-				players.remove(connection);
+			@Override
+			public void run() {
+				checkConnections();
+				
 			}
 			
-		});
+		}, 10000);
+	
+		Gdx.app.log("Server Lobby World", "Lobby Created");
+	}
+	
+	private void checkConnections(){
+		
+		for(Connection c : server.getConnections()){
+			
+			boolean connected = false;
+			
+			for(int key : players.keySet()){
+				if(key == c.getID()){
+					connected = true;
+				}
+			}
+			
+			if(!connected){
+				players.remove(c.getID());
+			}
+		}
+		
 	}
 	
 	private void startGame(Connection connection){
@@ -112,9 +137,12 @@ public class ServerLobbyWorld {
 	}
 	
 	public void dispose() {
+		
 		while(!listeners.isEmpty()){
 			server.removeListener(listeners.pop());
 		}
+		
+		timer.cancel();
 	}
 	
 }

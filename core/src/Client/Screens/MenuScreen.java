@@ -8,12 +8,14 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.tdg.gdx.TypingGame;
 
 import Client.Requests.JoinRequest;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
+import Client.Utils.Errors;
 import Client.Utils.MenuManager;
 import Server.Utils.ServerManager;
 
@@ -24,7 +26,7 @@ public class MenuScreen implements Screen{
 	private TextField field;
 	private StretchViewport view;
 	private MenuManager menu;
-	
+	private Label errorMessageLabel;
 	private ServerManager server;
 	
 	public MenuScreen(TypingGame game) {
@@ -34,7 +36,9 @@ public class MenuScreen implements Screen{
 		
 		menu = new MenuManager(view);
 		
-		menu.setCellSize(80, 40);
+		menu.setCellSize(100, 40);
+		
+		errorMessageLabel = menu.addFloatingText("", 0, 0);
 		
 		//Menu Setup
 		Label title = menu.addLabel("Typing Champ");
@@ -74,6 +78,16 @@ public class MenuScreen implements Screen{
 		});
 		menu.row();
 		
+		menu.addTextButton("How to Play").addListener(new ChangeListener() {
+			
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				Gdx.net.openURI("www.google.com");
+				
+			}
+		});
+		menu.row();
+		
 		menu.addTextButton("Exit").addListener(new ChangeListener(){
 
 			@Override
@@ -91,7 +105,16 @@ public class MenuScreen implements Screen{
 		if(server.bind(54555, 54777) && client.connectLan(name, 54555, 54777)){
 			client.getClient().sendTCP(new JoinRequest(name));
 			game.setScreen(new LobbyScreen(game, server, client));
+		}else{
+			setErrorText();
 		}
+	}
+	
+	private void setErrorText() {
+		
+		errorMessageLabel = menu.addFloatingText("Failed to bind ports", 0, 0);
+		errorMessageLabel.setPosition(Constants.V_WIDTH/2 - errorMessageLabel.getWidth()/2, 40);
+		
 	}
 	
 	private void setClient(String name){

@@ -305,9 +305,17 @@ public class ClientGameWorld {
 		
 		Gdx.app.log("Client Game World", "Recieved Game Over Response");
 		
-		menu.removeActor(field);
-		menu.removeActor(wordLabel);
-		menu.removeActor(koTimeLabel);
+		if(field != null){
+			menu.removeActor(field);
+		}
+		
+		if(wordLabel != null){
+			menu.removeActor(wordLabel);
+		}
+		
+		if(koTimeLabel != null){
+			menu.removeActor(koTimeLabel);
+		}
 		
 		Label label = menu.addFloatingText(r.name + " Wins!", 0, 0);
 		label.setPosition(Constants.V_WIDTH/2 - label.getWidth()/2, Constants.V_HEIGHT/2 - label.getHeight()/2);

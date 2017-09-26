@@ -74,17 +74,6 @@ public class ServerGameWorld{
 		});
 		server.addListener(listeners.peek());
 		
-		//Disconnect Listener
-		listeners.push(new Listener(){
-			
-			@Override
-			public void disconnected(Connection connection) {
-				disconnect(connection.getID());
-			}
-			
-		});
-		server.addListener(listeners.peek());
-		
 		//Entities
 		players = matchPlayers;
 		for(ServerPlayer player : matchPlayers){
@@ -107,6 +96,7 @@ public class ServerGameWorld{
 			
 			@Override
 			public void run() {
+				checkDisconnects();
 				update((float)TIME_STEP/1000f);
 				checkKnockouts();
 			}
@@ -236,21 +226,32 @@ public class ServerGameWorld{
 	}
 	
 	
-	private void disconnect(int id) {
+	private void checkDisconnects() {
+		
+		ServerPlayer prev = players[1];
 		
 		for(ServerPlayer player : players){
 			
 			IdComponent ic = im.get(player);
-			if(id == ic.id){
-				for(int i = 0; i < players.length; ++i){
-					IdComponent ic2 = im.get(players[i]);
-					if(ic.id != id){
-						server.sendToTCP(player.getID(), new GameOverResponse(ic2.name));
-					}
+			boolean connected = false;
+			
+			for(Connection c : server.getConnections()){
+				int id = c.getID();
+				if(id == ic.id){
+					connected = true;
 				}
-				
 			}
 			
+			if(!connected){
+				Gdx.app.log("Server Game World", ic.name + " disconnected");
+				ic = im.get(prev);
+				server.sendToTCP(prev.getID(), new GameOverResponse(ic.name));
+				completed = true;
+				dispose();
+				break;
+			}
+			
+			prev = player;
 		}
 		
 	}
@@ -264,7 +265,9 @@ public class ServerGameWorld{
 			server.removeListener(listeners.pop());
 		}
 		
-		koSystem.dispose();
+		if(koSystem != null){
+			koSystem.dispose();
+		}
 		
 		for(ServerPlayer player : players){
 			player.reset();

@@ -30,9 +30,13 @@ public class JoinRequestListener extends Listener {
 			
 			JoinRequest r = (JoinRequest)object;
 			
+			Gdx.app.log("Server - JoinRequestListener: ", r.name + " has requested to join the game");
+			
 			if(addPlayer(connection, r.name)){
 				
 				Gdx.app.log("Join Request Listener: ", r.name + " has joined the game");
+				
+				players.put(connection.getID(), new ServerPlayer(r.name, connection));
 				
 				for(int key : players.keySet()){
 					server.sendToTCP(connection.getID(), new JoinResponse(players.get(key).getName(), true));
@@ -41,6 +45,9 @@ public class JoinRequestListener extends Listener {
 				server.sendToAllExceptTCP(connection.getID(), new JoinResponse(r.name, true));
 				server.sendToAllExceptTCP(connection.getID(), new MessageResponse(r.name.toUpperCase(), " HAS JOINED THE LOBBY"));
 				
+			}else{
+				Gdx.app.log("Join Request Listener: ", r.name + " has failed to join the game");
+				server.sendToTCP(connection.getID(), new JoinResponse(r.name, false));
 			}
 			
 		}
@@ -50,8 +57,13 @@ public class JoinRequestListener extends Listener {
 	private boolean addPlayer(Connection connection, String name) {
 		
 		if(!players.containsKey(connection.getID())){
+			for(int key : players.keySet()){
+				if(players.get(key).getName().equals(name) ){
+					Gdx.app.log("Server - JoinRequestListener", name + " tried to join the lobby.");
+					return false;
+				}
+			}
 			
-			players.put(connection.getID(), new ServerPlayer(name, connection));
 			return true;
 		}
 		

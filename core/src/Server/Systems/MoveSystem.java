@@ -159,14 +159,14 @@ public class MoveSystem extends EntitySystem{
 					StateComponent sc = sm.get(entity);
 					
 					//Gets the adjusted damage
-					int damage = getDamage((ServerPlayer)entity, r.move);
+					int damage = getDamage((ServerPlayer)entity, player, r.move);
 					
 					//Jab Energy Mitigation
 					if(r.move == MoveType.JAB && ec.energy > ec.MAX_ENERGY * .5f){
 						
 						Gdx.app.log("Move System", ic.name + ": Energy -> ( " + ec.energy + ", " + (ec.energy - damage) + ")");
 						
-						ec.energy -= damage;
+						ec.energy -= damage * 1.5f;
 						if(ec.energy < 0 ){
 							ec.energy = 0;
 						}
@@ -220,7 +220,7 @@ public class MoveSystem extends EntitySystem{
 		
 	}
 	
-	private int getDamage(ServerPlayer opponent, MoveType move){
+	private int getDamage(ServerPlayer opponent, ServerPlayer player, MoveType move){
 		
 		StateComponent stateComponent = sm.get(opponent);
 		
@@ -228,7 +228,7 @@ public class MoveSystem extends EntitySystem{
 		PlayerState state = stateComponent.state;
 		stateComponent.move = move;
 		
-		if(state == PlayerState.BLOCKING){
+		if(state == PlayerState.BLOCKING && move != MoveType.HOOK){
 			return 0;
 		}
 		else if(move == MoveType.JAB){
@@ -246,23 +246,14 @@ public class MoveSystem extends EntitySystem{
 			
 			damage = MoveInformation.UPPERCUT_DAMAGE;
 			stateComponent.state = PlayerState.WEAKEND;
-			opponent.setStateTimer();
 			
 		}else if(move == MoveType.HOOK){
-			
 			damage = MoveInformation.HOOK_DAMAGE;
 			if(stateComponent.state == PlayerState.BLOCKING){
 				damage *= MoveInformation.HOOK_MOD;
 			}
 			
-		}else if(move == MoveType.COUNTER){
-			
-			if(stateComponent.state != PlayerState.BLOCKING && stateComponent.state != PlayerState.OPEN){
-				damage = MoveInformation.COUNTER_DAMAGE;
-			}
-			
 		}
-		
 		if(stateComponent.state == PlayerState.WEAKEND){
 			damage *= MoveInformation.WEAKEND_MOD;
 		}

@@ -19,7 +19,7 @@ public class MessageResponseListener extends Listener {
 		
 		if(object instanceof MessageResponse){
 			MessageResponse r = (MessageResponse)object;
-			Gdx.app.log("MessageResponseListener: Message Received: ", r.name + ": " + r.message);
+			Gdx.app.log("Client - MessageResponseListener", "Message Received: " + r.name + ": " + r.message);
 			area.appendText(r.name + ": " + r.message + "\n");
 		}
 		

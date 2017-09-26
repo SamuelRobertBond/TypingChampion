@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -18,6 +19,7 @@ import com.tdg.gdx.TypingGame;
 import Client.Requests.JoinRequest;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
+import Client.Utils.Errors;
 import Client.Utils.MenuManager;
 import Server.Responses.JoinResponse;
 
@@ -29,6 +31,7 @@ public class ConnectionScreen implements Screen{
 	private MenuManager menu;
 	private Table popupTable;
 	private TextField field;
+	private Label errorMessageLabel;
 	
 	private ClientManager clientManager;
 	
@@ -48,6 +51,8 @@ public class ConnectionScreen implements Screen{
 		clientManager = new ClientManager(name);
 		
 		menu = new MenuManager(view);
+		
+		errorMessageLabel = menu.addFloatingText("", 0, 0);
 		
 		menu.setCellSize(80, 40);
 		
@@ -127,13 +132,20 @@ public class ConnectionScreen implements Screen{
 					
 					JoinResponse r = (JoinResponse)object;
 					
+					Gdx.app.log("Client - ConnectionScreen", "Join Response Recieved");
+					
 					if(r.success){
 						joinLobby();
+					}else{
+						Gdx.app.log("Client - Connection Screen", "The player has failed to join the client");
+						setErrorText(Errors.NAME);
 					}
 					
 				}
 				
 			}
+
+
 			
 		});
 		clientManager.getClient().addListener(listeners.peek());
@@ -141,6 +153,7 @@ public class ConnectionScreen implements Screen{
 		changeScreen = false;
 		
 	}
+	
 	
 	private void joinLobby(){
 		changeScreen = true;
@@ -156,10 +169,30 @@ public class ConnectionScreen implements Screen{
 		game.setScreen(new MenuScreen(game));
 	}
 	
+	private void setErrorText(Errors error) {
+		
+		String text = "";
+		
+		menu.removeActor(errorMessageLabel);
+		
+		if(error == Errors.NAME){
+			text = "Please change your name";
+		}else if(error == Errors.CONNECTION){
+			text = "Failed to connect";
+		}
+		
+		errorMessageLabel = menu.addFloatingText(text, 0, 0);
+		errorMessageLabel.setPosition(Constants.V_WIDTH/2 - errorMessageLabel.getWidth()/2, 40);
+		
+	}
+	
 	private void connect(String addr){
 		
 		if(clientManager.connectNet(name, addr, 54555, 54777)){
+			Gdx.app.log("Client - ConnectionScreen", "Sending Join Request");
 			clientManager.getClient().sendTCP(new JoinRequest(name));
+		}else{
+			setErrorText(Errors.CONNECTION);
 		}
 		
 	}
@@ -167,7 +200,10 @@ public class ConnectionScreen implements Screen{
 	private void localGame(){
 		
 		if(clientManager.connectLan(name, 54555, 54777)){
+			Gdx.app.log("Client - ConnectionScreen", "Sending Join Request");
 			clientManager.getClient().sendTCP(new JoinRequest(name));
+		}else{
+			setErrorText(Errors.CONNECTION);
 		}
 			
 	}
