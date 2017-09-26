@@ -5,7 +5,6 @@ import java.util.Stack;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -72,6 +71,17 @@ public class ServerGameWorld{
 				}
 			}
 		
+		});
+		server.addListener(listeners.peek());
+		
+		//Disconnect Listener
+		listeners.push(new Listener(){
+			
+			@Override
+			public void disconnected(Connection connection) {
+				disconnect(connection.getID());
+			}
+			
 		});
 		server.addListener(listeners.peek());
 		
@@ -163,8 +173,9 @@ public class ServerGameWorld{
 				server.sendToTCP(player.getID(), new GameOverResponse(winnerName));
 			}
 			
-			dispose();
 			completed = true;
+			
+			dispose();
 		
 		}else if(koSystem.hasCompleted()){
 			
@@ -225,6 +236,26 @@ public class ServerGameWorld{
 	}
 	
 	
+	private void disconnect(int id) {
+		
+		for(ServerPlayer player : players){
+			
+			IdComponent ic = im.get(player);
+			if(id == ic.id){
+				for(int i = 0; i < players.length; ++i){
+					IdComponent ic2 = im.get(players[i]);
+					if(ic.id != id){
+						server.sendToTCP(player.getID(), new GameOverResponse(ic2.name));
+					}
+				}
+				
+			}
+			
+		}
+		
+	}
+	
+	
 	public void dispose(){
 		
 		update.cancel();
@@ -234,6 +265,12 @@ public class ServerGameWorld{
 		}
 		
 		koSystem.dispose();
+		
+		for(ServerPlayer player : players){
+			player.reset();
+		}
+		
+		engine.removeAllEntities();
 	}
 
 }

@@ -78,5 +78,21 @@ public class ServerPlayer extends Entity{
 	public int getID(){
 		return idComponent.id;
 	}
+
+	public void reset() {
+		
+		removeAll();
+		
+		healthComponent = new HealthComponent();
+		energyComponent = new EnergyComponent();
+		stateComponent = new StateComponent(PlayerState.OPEN);
+		wordComponent = new WordComponent("First");
+		
+		add(idComponent);
+		add(healthComponent);
+		add(energyComponent);
+		add(stateComponent);
+		add(wordComponent);
+	}
 	
 }

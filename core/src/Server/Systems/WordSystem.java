@@ -54,9 +54,11 @@ public class WordSystem extends EntitySystem{
 	
 	private void processWord(int id, WordSubmissionRequest r){
 		
-		Gdx.app.log("WordSystem", "Word Recieved");
+		Gdx.app.log("Server - WordSystem", "Word Recieved");
 		
 		for(Entity entity : entities){
+			
+			
 			
 			IdComponent ic = im.get(entity);
 			WordComponent wc = wm.get(entity);
@@ -104,7 +106,6 @@ public class WordSystem extends EntitySystem{
 		Gdx.app.log("MoveSystem", "Sending Stats");
 		
 		server.sendToTCP(ic.id, new StatResponse(hc.health, ec.energy));
-		
 	}
 	
 }

@@ -66,6 +66,11 @@ public class WordUtil {
 		
 		if(words.containsKey(length)){
 			LinkedList<String> l = words.get(length);
+			
+			if(length >= l.size()){
+				length = l.size() - 1;
+			}
+			
 			return l.get(MathUtils.random(l.size() - 1));
 		}else{
 			return null;

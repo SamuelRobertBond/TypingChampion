@@ -186,7 +186,6 @@ public class MoveSystem extends EntitySystem{
 							sc.state =  PlayerState.KNOCKED_OUT;
 						}
 						
-						//Response Systems
 						
 						//Attacker update
 						sendStats(player);
@@ -221,20 +220,20 @@ public class MoveSystem extends EntitySystem{
 		
 	}
 	
-	private int getDamage(ServerPlayer player, MoveType move){
+	private int getDamage(ServerPlayer opponent, MoveType move){
 		
-		StateComponent stateComponent = sm.get(player);
+		StateComponent stateComponent = sm.get(opponent);
 		
 		int damage = 0;
 		PlayerState state = stateComponent.state;
 		stateComponent.move = move;
 		
-		if(move == MoveType.JAB){
+		if(state == PlayerState.BLOCKING){
+			return 0;
+		}
+		else if(move == MoveType.JAB){
 			
 			damage = MoveInformation.JAB_DAMAGE;
-			if(PlayerState.BLOCKING == state){
-				return 0;
-			}
 			
 		}else if(move == MoveType.CROSS){
 			
@@ -247,7 +246,7 @@ public class MoveSystem extends EntitySystem{
 			
 			damage = MoveInformation.UPPERCUT_DAMAGE;
 			stateComponent.state = PlayerState.WEAKEND;
-			player.setStateTimer();
+			opponent.setStateTimer();
 			
 		}else if(move == MoveType.HOOK){
 			
@@ -260,7 +259,6 @@ public class MoveSystem extends EntitySystem{
 			
 			if(stateComponent.state != PlayerState.BLOCKING && stateComponent.state != PlayerState.OPEN){
 				damage = MoveInformation.COUNTER_DAMAGE;
-				
 			}
 			
 		}

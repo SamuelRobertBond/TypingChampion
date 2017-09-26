@@ -27,6 +27,7 @@ import Client.Utils.Constants;
 import Client.Utils.GameUtils;
 import Client.Utils.MenuManager;
 import Client.Utils.MoveType;
+import Server.Enities.ServerPlayer;
 import Server.Responses.AnimationResponse;
 import Server.Responses.GameOverResponse;
 import Server.Responses.KOResponse;
@@ -68,8 +69,8 @@ public class ClientGameWorld {
 		this.client = client;	
 		this.view = view;
 		name = client.name;
-		completed = false;
 		
+		completed = false;
 		knockedOut = false;
 		
 		menu = new MenuManager(view);
@@ -180,6 +181,7 @@ public class ClientGameWorld {
 			
 		});
 		client.getClient().addListener(listeners.peek());
+
 		
 		//Players
 		players = new HashMap<String, ClientPlayer>();
@@ -340,4 +342,5 @@ public class ClientGameWorld {
 		}
 		
 	}
+	
 }

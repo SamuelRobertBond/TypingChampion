@@ -62,6 +62,14 @@ public class ServerLobbyWorld {
 		});
 		server.addListener(listeners.peek());
 		
+		
+		listeners.push(new Listener(){
+			
+			public void disconnected(Connection connection) {
+				players.remove(connection);
+			}
+			
+		});
 	}
 	
 	private void startGame(Connection connection){
