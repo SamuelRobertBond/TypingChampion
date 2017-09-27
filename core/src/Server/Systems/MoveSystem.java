@@ -8,7 +8,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -21,7 +20,6 @@ import Server.Components.IdComponent;
 import Server.Components.StateComponent;
 import Server.Enities.ServerPlayer;
 import Server.Responses.AnimationResponse;
-import Server.Responses.KOResponse;
 import Server.Responses.StatResponse;
 import Server.Utils.MoveInformation;
 import Server.Utils.PlayerState;
@@ -64,6 +62,7 @@ public class MoveSystem extends EntitySystem{
 		server.addListener(moveListener);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void addedToEngine(Engine engine) {
 		entities = engine.getEntitiesFor(Family.all(EnergyComponent.class, HealthComponent.class).get());
@@ -164,7 +163,7 @@ public class MoveSystem extends EntitySystem{
 					//Jab Energy Mitigation
 					if(r.move == MoveType.JAB && ec.energy > ec.MAX_ENERGY * .5f){
 						
-						Gdx.app.log("Move System", ic.name + ": Energy -> ( " + ec.energy + ", " + (ec.energy - damage) + ")");
+						//Gdx.app.log("Move System", ic.name + ": Energy -> ( " + ec.energy + ", " + (ec.energy - damage) + ")");
 						
 						ec.energy -= damage * 1.5f;
 						if(ec.energy < 0 ){
@@ -178,7 +177,7 @@ public class MoveSystem extends EntitySystem{
 						
 						//Health Deduction
 						HealthComponent hc = hm.get(entity);
-						Gdx.app.log("Move System", ic.name + ": Health -> ( " + hc.health + ", " + (hc.health - damage) + ")");
+						//Gdx.app.log("Move System", ic.name + ": Health -> ( " + hc.health + ", " + (hc.health - damage) + ")");
 						hc.health -= damage;
 						
 						if(hc.health < 0){
@@ -214,7 +213,7 @@ public class MoveSystem extends EntitySystem{
 		EnergyComponent ec = em.get(player);
 		IdComponent ic = im.get(player);
 		
-		Gdx.app.log("MoveSystem", "Sending Stats");
+		//Gdx.app.log("MoveSystem", "Sending Stats");
 		
 		server.sendToTCP(ic.id, new StatResponse(hc.health, ec.energy));
 		

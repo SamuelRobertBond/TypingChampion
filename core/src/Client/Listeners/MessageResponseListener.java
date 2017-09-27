@@ -1,6 +1,5 @@
 package Client.Listeners;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -19,7 +18,6 @@ public class MessageResponseListener extends Listener {
 		
 		if(object instanceof MessageResponse){
 			MessageResponse r = (MessageResponse)object;
-			Gdx.app.log("Client - MessageResponseListener", "Message Received: " + r.name + ": " + r.message);
 			area.appendText(r.name + ": " + r.message + "\n");
 		}
 		

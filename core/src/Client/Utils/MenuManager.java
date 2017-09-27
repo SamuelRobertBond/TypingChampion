@@ -4,7 +4,6 @@ import java.util.LinkedList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -34,7 +33,6 @@ public class MenuManager {
 	private Stage stage;
 	private Table table;
 	private Skin skin;
-	private BitmapFont font;
 	
 	private LinkedList<TextButton> buttons;
 	

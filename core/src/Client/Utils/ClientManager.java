@@ -2,12 +2,8 @@ package Client.Utils;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Client;
-
-import Client.Listeners.MessageResponseListener;
 
 public class ClientManager {
 	

@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -12,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -27,7 +28,6 @@ import Client.Utils.Constants;
 import Client.Utils.GameUtils;
 import Client.Utils.MenuManager;
 import Client.Utils.MoveType;
-import Server.Enities.ServerPlayer;
 import Server.Responses.AnimationResponse;
 import Server.Responses.GameOverResponse;
 import Server.Responses.KOResponse;
@@ -64,6 +64,19 @@ public class ClientGameWorld {
 	
 	private boolean knockedOut;
 	
+	private final Music MUSIC_SOUND;
+	private final float MUSIC_VOLUME = .05f;
+	
+	private final Sound PUNCH_SOUND;
+	private final float PUNCH_VOLUME = .3f;
+	
+	private final Sound BELL_SOUND;
+	private final float BELL_VOLUME = .3f;
+	
+	private final Sound CORRECT_WORD_SOUND;
+	private final float CORRECT_WORD_VOLUME = .3f;
+	
+	
 	public ClientGameWorld(StretchViewport view, ClientManager client, String enemyName) {
 		
 		this.client = client;	
@@ -73,6 +86,14 @@ public class ClientGameWorld {
 		completed = false;
 		knockedOut = false;
 		
+		//Sounds
+		MUSIC_SOUND = Gdx.audio.newMusic(Constants.MUSIC);
+		PUNCH_SOUND = Gdx.audio.newSound(Constants.PUNCH);
+		BELL_SOUND = Gdx.audio.newSound(Constants.BELL);
+		CORRECT_WORD_SOUND= Gdx.audio.newSound(Constants.WORD_CORRECT);
+		
+		
+		//Menu
 		menu = new MenuManager(view);
 		
 		//Text Field Enter Listener
@@ -106,6 +127,7 @@ public class ClientGameWorld {
 					
 					if(r.success){
 						Gdx.app.log("Client Game World", "Receieved new word");
+						CORRECT_WORD_SOUND.play(CORRECT_WORD_VOLUME);
 						changeWord(r.newWord);
 					}
 				}			
@@ -149,6 +171,7 @@ public class ClientGameWorld {
 			public void received(Connection connection, Object object) {
 				
 				if(object instanceof AnimationResponse){
+					PUNCH_SOUND.play(PUNCH_VOLUME);
 					setAnimation((AnimationResponse)object);
 				}
 				
@@ -175,6 +198,7 @@ public class ClientGameWorld {
 			@Override
 			public void received(Connection connection, Object object) {
 				if(object instanceof GameOverResponse){
+					BELL_SOUND.play(BELL_VOLUME);
 					gameover((GameOverResponse)object);
 				}
 			}
@@ -200,11 +224,15 @@ public class ClientGameWorld {
 		engine.addEntity(players.get(client.name));
 		engine.addEntity(players.get(enemyName));
 		
-		spriteSystem = new SpriteRenderSystem(name);
+		spriteSystem = new SpriteRenderSystem(name, view);
 		engine.addSystem(spriteSystem);
 		
-		uiSystem = new UiRenderSystem(players.get(client.name));
+		uiSystem = new UiRenderSystem(players.get(client.name), view);
 		engine.addSystem(uiSystem);
+		
+		MUSIC_SOUND.setLooping(true);
+		MUSIC_SOUND.setVolume(MUSIC_VOLUME);
+		MUSIC_SOUND.play();
 		
 		Gdx.app.log("Client Game World", "Finished Constructing");
 	}
@@ -318,7 +346,7 @@ public class ClientGameWorld {
 		}
 		
 		Label label = menu.addFloatingText(r.name + " Wins!", 0, 0);
-		label.setPosition(Constants.V_WIDTH/2 - label.getWidth()/2, Constants.V_HEIGHT/2 - label.getHeight()/2);
+		label.setPosition(Constants.V_WIDTH/2 - label.getWidth()/2, Constants.V_HEIGHT/3.5f - label.getHeight()/2);
 		
 		TextButton button = menu.addFloatingButton("To Menu", 0 , 0);
 		button.setSize(Constants.V_WIDTH/4, 20);
@@ -344,7 +372,14 @@ public class ClientGameWorld {
 	}
 	
 	public void dispose(){
+		
 		menu.dispose();
+		
+		MUSIC_SOUND.dispose();
+		BELL_SOUND.dispose();
+		PUNCH_SOUND.dispose();
+		CORRECT_WORD_SOUND.dispose();
+		
 		while(!listeners.isEmpty()){
 			client.getClient().removeListener(listeners.poll());
 		}

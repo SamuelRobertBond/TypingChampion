@@ -1,12 +1,12 @@
 package Client.Screens;
 
-import java.util.HashMap;
 import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -49,10 +49,15 @@ public class LobbyScreen implements Screen{
 
 	private StartResponse start;
 	
+	private final Sound BEEP;
+	private final float BEEP_VOLUME =.3f;
+	
 	
 	public LobbyScreen(TypingGame game, ServerManager server, ClientManager client) {
 		
 		this.game = game;
+		
+		BEEP = Gdx.audio.newSound(Constants.BEEP);
 		
 		this.listeners = new Stack<Listener>();
 		
@@ -68,6 +73,8 @@ public class LobbyScreen implements Screen{
 		
 		this.game = game;
 		this.client = client;
+		
+		BEEP = Gdx.audio.newSound(Constants.BEEP);
 		
 		this.listeners = new Stack<Listener>();
 		
@@ -105,6 +112,7 @@ public class LobbyScreen implements Screen{
 			
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				BEEP.play(BEEP_VOLUME * .5f);
 				sendMessage();
 			}
 			
@@ -114,7 +122,8 @@ public class LobbyScreen implements Screen{
 		ready.addListener(new ChangeListener(){
 			
 			@Override
-			public void changed(ChangeEvent event, Actor actor) {	
+			public void changed(ChangeEvent event, Actor actor) {
+				BEEP.play(BEEP_VOLUME);
 				setReady();
 			}
 			
@@ -223,6 +232,8 @@ public class LobbyScreen implements Screen{
 
 	@Override
 	public void dispose() {
+		
+		BEEP.dispose();
 		
 		while(!listeners.isEmpty()){
 			client.getClient().removeListener(listeners.pop());

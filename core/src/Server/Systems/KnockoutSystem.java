@@ -5,22 +5,17 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
-import Client.Requests.KOWordRequest;
-import Client.Requests.MoveRequest;
 import Client.Requests.WordSubmissionRequest;
 import Server.Components.HealthComponent;
 import Server.Components.IdComponent;
-import Server.Components.StateComponent;
 import Server.Enities.ServerPlayer;
 import Server.Responses.KOResponse;
 import Server.Responses.KOUpdateResponse;
 import Server.Responses.WordSubmissionResponse;
-import Server.Utils.PlayerState;
 import Server.Utils.WordUtil;
 
 public class KnockoutSystem extends EntitySystem {
@@ -106,7 +101,6 @@ public class KnockoutSystem extends EntitySystem {
 			knockedOut = true;
 		}
 		
-		Gdx.app.log("Knockout System", "Countdown: " + timeElapsed);
 	}
 	
 	public void dispose(){

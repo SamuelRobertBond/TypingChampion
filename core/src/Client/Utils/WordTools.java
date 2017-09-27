@@ -28,6 +28,8 @@ public class WordTools {
 				
 				String word = in.nextLine();
 				
+				System.out.println(word);
+				
 				if(!(word.length() < 3 || word.contains(":") || word.contains("'") || word.contains(".") || word.contains("'") || word.contains("-") || word.length() > 12)){
 					queue.offer(word);
 				}
@@ -51,6 +53,8 @@ public class WordTools {
 				writer.newLine();
 				
 			}
+			
+			in.close();
 			
 			System.out.println("done");
 			

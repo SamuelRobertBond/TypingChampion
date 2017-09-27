@@ -10,6 +10,7 @@ import Client.Utils.GameUtils;
 import Server.World.ServerGameWorld;
 import Server.World.ServerLobbyWorld;
 
+@SuppressWarnings("unused")
 public class ServerManager {
 
 	private Server server;

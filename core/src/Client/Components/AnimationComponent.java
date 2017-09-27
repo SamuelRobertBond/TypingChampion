@@ -4,11 +4,9 @@ import java.util.HashMap;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import Client.Utils.MoveType;
-import Client.Utils.SpriteType;
 
 public class AnimationComponent implements Component{
 

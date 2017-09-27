@@ -21,7 +21,7 @@ public class ClientPlayer extends Entity{
 
 	public ClientPlayer(String name, float x, float y, float width, float height) {
 		
-		positionComponent = new PositionComponent(x, y, width, height);
+		positionComponent = new PositionComponent(x, y, width *1.2f, height * 1.2f);
 		animationComponent = new AnimationComponent();
 		statsComponent = new StatsComponent(name);
 		

@@ -6,7 +6,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -54,11 +53,7 @@ public class WordSystem extends EntitySystem{
 	
 	private void processWord(int id, WordSubmissionRequest r){
 		
-		Gdx.app.log("Server - WordSystem", "Word Recieved");
-		
 		for(Entity entity : entities){
-			
-			
 			
 			IdComponent ic = im.get(entity);
 			WordComponent wc = wm.get(entity);
@@ -88,6 +83,7 @@ public class WordSystem extends EntitySystem{
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void addedToEngine(Engine engine) {
 		entities = engine.getEntitiesFor(Family.all(WordComponent.class).get());
@@ -102,8 +98,6 @@ public class WordSystem extends EntitySystem{
 		HealthComponent hc = hm.get(player);
 		EnergyComponent ec = em.get(player);
 		IdComponent ic = im.get(player);
-		
-		Gdx.app.log("MoveSystem", "Sending Stats");
 		
 		server.sendToTCP(ic.id, new StatResponse(hc.health, ec.energy));
 	}

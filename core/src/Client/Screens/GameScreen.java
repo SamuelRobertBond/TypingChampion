@@ -9,7 +9,6 @@ import com.tdg.gdx.TypingGame;
 import Client.Requests.StartMatchRequest;
 import Client.Utils.ClientManager;
 import Client.Utils.Constants;
-import Client.Utils.MenuManager;
 import Client.Worlds.ClientGameWorld;
 import Server.Utils.ServerManager;
 
@@ -17,12 +16,14 @@ public class GameScreen implements Screen{
 
 	private TypingGame game;
 	private StretchViewport view;
-	private MenuManager menu;
 	
 	private ClientManager client;
+	
+	@SuppressWarnings("unused")
 	private ServerManager server;
 	
 	private ClientGameWorld world;
+	
 	
 
 	public GameScreen(TypingGame game, ClientManager client, ServerManager server, String enemyName) {

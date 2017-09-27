@@ -15,6 +15,7 @@ import Client.Requests.ReadyRequest;
 import Server.Enities.ServerPlayer;
 import Server.Listeners.JoinRequestListener;
 import Server.Listeners.MessageRequestListener;
+import Server.Responses.MessageResponse;
 import Server.Responses.StartResponse;
 
 public class ServerLobbyWorld {
@@ -101,7 +102,7 @@ public class ServerLobbyWorld {
 		
 		ServerPlayer player = players.get(connection.getID());
 		
-		Gdx.app.log("Server Lobby World", player.getName() + " is ready");
+		server.sendToAllTCP(new MessageResponse(player.getName(), "I'm ready"));
 		
 		//Check for games to start
 		for(int key : players.keySet()){

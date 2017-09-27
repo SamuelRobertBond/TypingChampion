@@ -1,5 +1,6 @@
 package Server.Listeners;
 
+import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -20,6 +21,7 @@ public class MessageRequestListener extends Listener {
 		
 		if(object instanceof MessageRequest){
 			MessageRequest r = (MessageRequest)object;
+			Gdx.app.log("Server - Message", r.name + ": " + r.message);
 			server.sendToAllExceptTCP(connection.getID(), new MessageResponse(r.name, r.message));
 		}
 		

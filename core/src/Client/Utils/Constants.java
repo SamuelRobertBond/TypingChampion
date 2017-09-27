@@ -16,4 +16,11 @@ public class Constants {
 	public static final FileHandle PLAYER_SPRITE_SHEET = Gdx.files.internal("Spirtes/player.png");
 	public static final FileHandle ENEMY_SPRITE_SHEET = Gdx.files.internal("Spirtes/enemy.png");
 	
+	//Sounds
+	public static final FileHandle PUNCH = Gdx.files.internal("Sounds/punch.wav");
+	public static final FileHandle BELL = Gdx.files.internal("Sounds/bell.ogg");
+	public static final FileHandle BEEP = Gdx.files.internal("Sounds/beep.wav");
+	public static final FileHandle MUSIC = Gdx.files.internal("Sounds/music.mp3");
+	public static final FileHandle WORD_CORRECT = Gdx.files.internal("Sounds/correct.ogg");
+	
 }

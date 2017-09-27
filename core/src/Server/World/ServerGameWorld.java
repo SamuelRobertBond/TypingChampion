@@ -55,7 +55,7 @@ public class ServerGameWorld{
 	
 	public ServerGameWorld(int id, ServerPlayer[] matchPlayers, Server server) {
 		
-		Gdx.app.log("Server Game World", "Game World Created");
+		//Gdx.app.log("Server Game World", "Game World Created");
 		
 		engine = new Engine();
 		this.server = server;
@@ -118,7 +118,7 @@ public class ServerGameWorld{
 	
 	private void signalGameStart(){
 		
-		Gdx.app.log("ServerGameWorld", "signalling game start");
+		Gdx.app.log("ServerGameWorld", "Signalling game start");
 		
 		for(ServerPlayer player : players){
 			server.sendToTCP(player.getID(), new WordSubmissionResponse(true, "First"));
@@ -135,7 +135,7 @@ public class ServerGameWorld{
 				
 				if(sc.state == PlayerState.KNOCKED_OUT) {
 					
-					Gdx.app.log("Server Game World", p.getName() + " Knocked out");
+					//Gdx.app.log("Server Game World", p.getName() + " Knocked out");
 					
 					koSystem = new KnockoutSystem(server, p);
 					engine.addSystem(koSystem);
@@ -157,7 +157,7 @@ public class ServerGameWorld{
 			
 		}else if(koSystem.knockedOut()){
 			
-			Gdx.app.log("Server Game World", "Knocked Out, Sending GameOver Request");
+			//Gdx.app.log("Server Game World", "Knocked Out, Sending GameOver Request");
 			
 			for(ServerPlayer player : players){
 				server.sendToTCP(player.getID(), new GameOverResponse(winnerName));
@@ -218,8 +218,6 @@ public class ServerGameWorld{
 		HealthComponent hc = hm.get(player);
 		EnergyComponent ec = em.get(player);
 		IdComponent ic = im.get(player);
-		
-		Gdx.app.log("MoveSystem", "Sending Stats");
 		
 		server.sendToTCP(ic.id, new StatResponse(hc.health, ec.energy));
 		

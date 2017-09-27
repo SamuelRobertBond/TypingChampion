@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -13,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 import com.tdg.gdx.TypingGame;
 
 import Client.Requests.JoinRequest;
@@ -40,6 +40,9 @@ public class ConnectionScreen implements Screen{
 	private Stack<Listener> listeners;
 	
 	private boolean changeScreen;
+	
+	private final Sound BEEP;
+	private final float BEEP_VOLUME = .3f;
 
 	
 	public ConnectionScreen(TypingGame game, String name) {
@@ -47,6 +50,8 @@ public class ConnectionScreen implements Screen{
 		this.game = game;
 		view = new StretchViewport(Constants.V_WIDTH, Constants.V_HEIGHT);
 		listeners = new Stack<Listener>();
+		
+		BEEP = Gdx.audio.newSound(Constants.BEEP);
 		
 		clientManager = new ClientManager(name);
 		
@@ -63,7 +68,7 @@ public class ConnectionScreen implements Screen{
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				
+				BEEP.play(BEEP_VOLUME);
 				localGame();
 				
 			}
@@ -74,6 +79,7 @@ public class ConnectionScreen implements Screen{
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				BEEP.play(BEEP_VOLUME);
 				netGame();
 			}
 			
@@ -94,6 +100,7 @@ public class ConnectionScreen implements Screen{
 			
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				BEEP.play(BEEP_VOLUME);
 				popupOff();
 			}
 
@@ -106,6 +113,7 @@ public class ConnectionScreen implements Screen{
 			public void changed(ChangeEvent event, Actor actor) {
 				
 				if(!field.getText().equals("")){
+					BEEP.play(BEEP_VOLUME);
 					connect(field.getText());
 				}
 				
@@ -117,6 +125,7 @@ public class ConnectionScreen implements Screen{
 			
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				BEEP.play(BEEP_VOLUME);
 				back();
 			}
 			
@@ -268,6 +277,7 @@ public class ConnectionScreen implements Screen{
 	public void dispose() {
 		
 		menu.dispose();
+		BEEP.dispose();
 		
 		while(!listeners.isEmpty()){
 			clientManager.getClient().removeListener(listeners.pop());

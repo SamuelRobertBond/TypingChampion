@@ -5,7 +5,6 @@ import java.util.HashMap;
 import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Connection;
 import Client.Requests.JoinRequest;
-import Client.Requests.MessageRequest;
 import Server.Enities.ServerPlayer;
 import Server.Responses.JoinResponse;
 import Server.Responses.MessageResponse;
